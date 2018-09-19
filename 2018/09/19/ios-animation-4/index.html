@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="JasonH&#39;s Blog">
-    <title>iOS Animation - UIView.TransitionWithView - JasonH&#39;s Blog</title>
+    <title>ios-animation-4 - JasonH&#39;s Blog</title>
     <meta name="author" content="Juncheng Han">
     
     
@@ -15,21 +15,18 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"\nLearning notes for book iOS Animations by Tutorials.\n\nFirst, what is the difference between transitionWithView and animationWithDuration?animateWithDuration animates a UIView through changing its properties, whereas transitionWithView allows you to apply a transition to the specified view so that you can make state changes to it, such as add, remove, hide, show and replace one view with another view.\nThen, here is an example. We added a hidden logging status view to the root view. After clicked the Login button, we show the status view. After 1.5 seconds, we hide the status view and refresh to the next status.Image-1The code looks like this:1234567891011121314151617showMessage() &#123;    UIView.transitionWithView(status, duration: 0.33, options: [.CurveEaseOut, .TransitionCurlDown], animations: &#123;        self.status.hidden = false    &#125;, completion: &#123;_ in        delay(seconds: 1.5, completion: &#123;            self.removeMessage()        &#125;)    &#125;)&#125;removeMessage() &#123;    UIView.animateWithDuration(0.33, delay: 0.0, options: [], animations: &#123;         self.status.center.x += self.view.frame.size.width    &#125;, completion: &#123;_ in        self.status.hidden = true        self.showNextMessage()    &#125;)&#125;\nThe first parameter in transitionWithView() is the container view that performs the transition (Here is the status view). The rest of parameters are quite similar to the animateWithDuration().\nTransition option:\n\n.TransitionFlipFromLeft\n.TransitionFlipFromRight\n.TransitionCurlUp\n.TransitionCurlDown\n.TransitionCrossDissolve\n.TransitionFlipFromTop\n.TransitionFlipFromBottom\n\nThe original post is on May 25, 2016.\n","dateCreated":"2018-09-18T16:07:20-07:00","dateModified":"2018-09-18T17:10:41-07:00","datePublished":"2018-09-18T16:07:20-07:00","description":"\nLearning notes for book iOS Animations by Tutorials.\n\nFirst, what is the difference between transitionWithView and animationWithDuration?","headline":"iOS Animation - UIView.TransitionWithView","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2018/09/18/ios-animation-2/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2018/09/18/ios-animation-2/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
-    <meta name="description" content="Learning notes for book iOS Animations by Tutorials.  First, what is the difference between transitionWithView and animationWithDuration?">
-<meta name="keywords" content="iOS Animation,Swift">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"","dateCreated":"2018-09-19T15:03:53-07:00","dateModified":"2018-09-19T15:03:53-07:00","datePublished":"2018-09-19T15:03:53-07:00","description":"","headline":"ios-animation-4","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2018/09/19/ios-animation-4/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2018/09/19/ios-animation-4/"}</script>
+    <meta name="description" content="Juncheng Han">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="iOS Animation - UIView.TransitionWithView">
-<meta property="og:url" content="https://jasonhan1990.github.io/2018/09/18/ios-animation-2/index.html">
+<meta property="og:title" content="ios-animation-4">
+<meta property="og:url" content="https://jasonhan1990.github.io/2018/09/19/ios-animation-4/index.html">
 <meta property="og:site_name" content="JasonH&#39;s Blog">
-<meta property="og:description" content="Learning notes for book iOS Animations by Tutorials.  First, what is the difference between transitionWithView and animationWithDuration?">
+<meta property="og:description" content="Juncheng Han">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="https://jasonhan1990.github.io/2018/09/18/ios-animation-2/C3.gif">
-<meta property="og:updated_time" content="2018-09-19T00:10:41.931Z">
+<meta property="og:updated_time" content="2018-09-19T22:03:53.618Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS Animation - UIView.TransitionWithView">
-<meta name="twitter:description" content="Learning notes for book iOS Animations by Tutorials.  First, what is the difference between transitionWithView and animationWithDuration?">
-<meta name="twitter:image" content="https://jasonhan1990.github.io/2018/09/18/ios-animation-2/C3.gif">
+<meta name="twitter:title" content="ios-animation-4">
+<meta name="twitter:description" content="Juncheng Han">
     
     
         
@@ -37,9 +34,6 @@
     
         <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
     
-    
-        <meta property="og:image" content="https://jasonhan1990.github.ioSwift.png"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioSwift.png" />
     
     
     
@@ -230,25 +224,19 @@
 <article class="post">
     
     
-        <div class="post-header main-content-wrap text-center">
+        <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            iOS Animation - UIView.TransitionWithView
+            ios-animation-4
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2018-09-18T16:07:20-07:00">
+    <time datetime="2018-09-19T15:03:53-07:00">
 	
-		    Sep 18, 2018
+		    Sep 19, 2018
     	
     </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../../../../categories/iOS/">iOS</a>
-
-
     
 </div>
 
@@ -258,36 +246,12 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <blockquote>
-<p>Learning notes for book iOS Animations by Tutorials.</p>
-</blockquote>
-<p>First, what is the difference between <code>transitionWithView</code> and <code>animationWithDuration</code>?<br><a id="more"></a><code>animateWithDuration</code> animates a UIView through changing its properties, whereas <code>transitionWithView</code> allows you to apply a transition to the specified view so that you can make state changes to it, such as add, remove, hide, show and replace one view with another view.</p>
-<p>Then, here is an example. We added a hidden logging status view to the root view. After clicked the Login button, we show the status view. After 1.5 seconds, we hide the status view and refresh to the next status.<br><div class="figure center image" style="width:;"><img class="fig-img" src="C3.gif" alt="Image-1"><span class="caption">Image-1</span></div><br>The code looks like this:<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">showMessage() &#123;</span><br><span class="line">    <span class="type">UIView</span>.transitionWithView(status, duration: <span class="number">0.33</span>, options: [.<span class="type">CurveEaseOut</span>, .<span class="type">TransitionCurlDown</span>], animations: &#123;</span><br><span class="line">        <span class="keyword">self</span>.status.hidden = <span class="literal">false</span></span><br><span class="line">    &#125;, completion: &#123;<span class="number">_</span> <span class="keyword">in</span></span><br><span class="line">        delay(seconds: <span class="number">1.5</span>, completion: &#123;</span><br><span class="line">            <span class="keyword">self</span>.removeMessage()</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line">removeMessage() &#123;</span><br><span class="line">    <span class="type">UIView</span>.animateWithDuration(<span class="number">0.33</span>, delay: <span class="number">0.0</span>, options: [], animations: &#123; </span><br><span class="line">        <span class="keyword">self</span>.status.center.x += <span class="keyword">self</span>.view.frame.size.width</span><br><span class="line">    &#125;, completion: &#123;<span class="number">_</span> <span class="keyword">in</span></span><br><span class="line">        <span class="keyword">self</span>.status.hidden = <span class="literal">true</span></span><br><span class="line">        <span class="keyword">self</span>.showNextMessage()</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>The first parameter in <code>transitionWithView()</code> is the container view that performs the transition (Here is the status view). The rest of parameters are quite similar to the <code>animateWithDuration()</code>.</p>
-<p>Transition option:</p>
-<ul>
-<li>.TransitionFlipFromLeft</li>
-<li>.TransitionFlipFromRight</li>
-<li>.TransitionCurlUp</li>
-<li>.TransitionCurlDown</li>
-<li>.TransitionCrossDissolve</li>
-<li>.TransitionFlipFromTop</li>
-<li>.TransitionFlipFromBottom</li>
-</ul>
-<p>The original post is on May 25, 2016.</p>
-
+            
             
 
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br/>
-                
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS-Animation/">iOS Animation</a>
-
-            </div>
         
         
             <div class="post-actions-wrap">
@@ -295,8 +259,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../ios-animation-3/" data-tooltip="iOS Animation - Understanding Transform" aria-label="PREVIOUS: iOS Animation - Understanding Transform">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -305,7 +268,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../IOS-ANIMATION-1/" data-tooltip="iOS Animation - UIView.AnimationWithDurarion" aria-label="NEXT: iOS Animation - UIView.AnimationWithDurarion">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../18/ios-animation-3/" data-tooltip="iOS Animation - Understanding Transform" aria-label="NEXT: iOS Animation - Understanding Transform">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -323,7 +286,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/" title="Share on Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/" title="Share on Facebook">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -331,7 +294,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/" title="Share on Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/" title="Share on Twitter">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -339,7 +302,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/" title="Share on Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/" title="Share on Weibo">
                     <i class="fab fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -347,7 +310,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/&amp;title=iOS Animation - UIView.TransitionWithView" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=ios-animation-4" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
@@ -389,8 +352,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../ios-animation-3/" data-tooltip="iOS Animation - Understanding Transform" aria-label="PREVIOUS: iOS Animation - Understanding Transform">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -399,7 +361,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../IOS-ANIMATION-1/" data-tooltip="iOS Animation - UIView.AnimationWithDurarion" aria-label="NEXT: iOS Animation - UIView.AnimationWithDurarion">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../18/ios-animation-3/" data-tooltip="iOS Animation - Understanding Transform" aria-label="NEXT: iOS Animation - Understanding Transform">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -417,7 +379,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/" title="Share on Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/" title="Share on Facebook">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -425,7 +387,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/" title="Share on Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/" title="Share on Twitter">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -433,7 +395,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/" title="Share on Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/" title="Share on Weibo">
                     <i class="fab fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -441,7 +403,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/&amp;title=iOS Animation - UIView.TransitionWithView" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=ios-animation-4" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
@@ -468,7 +430,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/">
                     <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
                 </a>
             </li>
@@ -476,7 +438,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/">
                     <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
                 </a>
             </li>
@@ -484,7 +446,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/">
                     <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
                 </a>
             </li>
@@ -492,7 +454,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/18/ios-animation-2/&amp;title=iOS Animation - UIView.TransitionWithView">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=ios-animation-4">
                     <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
                 </a>
             </li>
