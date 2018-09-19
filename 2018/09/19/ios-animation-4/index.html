@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="JasonH&#39;s Blog">
-    <title>ios-animation-4 - JasonH&#39;s Blog</title>
+    <title>iOS Animation - Understanding UIView.Keyframe - JasonH&#39;s Blog</title>
     <meta name="author" content="Juncheng Han">
     
     
@@ -15,18 +15,22 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"","dateCreated":"2018-09-19T15:03:53-07:00","dateModified":"2018-09-19T15:03:53-07:00","datePublished":"2018-09-19T15:03:53-07:00","description":"","headline":"ios-animation-4","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2018/09/19/ios-animation-4/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2018/09/19/ios-animation-4/"}</script>
-    <meta name="description" content="Juncheng Han">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"When a view has several stages of moving animation, it is complicated to use animateWithDuration to implement the animation because it will contain nasty nesting in your code.However, Keyframe animation can solve the problem in an easy way. In UIView, there are two methods. \n\nanimateKeyframesWithDuration:delay:options:animations:completion:\naddKeyframeWithRelativeStartTime:relativeDuration:animations:\n\nThe first one creates an animation block object that can be used to set up keyframe-based animations for the current view. Well, the second one specifies the timing and animation values for a single frame of a keyframe animation.\nThe parameters in animateKeyframesWithDuration are easy to understand, but the parameters in addKeyframeWithRelativeStartTime are needed to take carefully.In addKeyframeWithRelativeStartTime:\n\nframeStartTime: The time at which to start the specified animations. This value must be in the range 0 to 1. The value is the percentage of the total duration time. If the total duration is 2 sec and the frameStartTime is 0.5, then the real starting time is at 1 sec.\n\nframeDuration: The length of time over which to animate to the specified value. This value must be in the range 0 to 1. The value is the percentage of the total duration time. If the total duration is 10 sec and the frameDuration is 0.25, then the real duration of this animation stage is 2.5 sec.\n\n\nOkey, let try to do this animation using keyframe animation.Image-1The stages of the moon rising and falling look like this:Image-2I used four stages. On X-axis, each stage moving length for the moon is identical which is a quarter of superview.width. On Y-axis, the moon climbs higher at the beginning of rising which means moon.y will minus a larger number in the first stage than in the second stage. For falling, it is the opposite of rising. To make the moon move smoothly, I choose CalculationModeCubic for the keyframe animation option.\nHere is the code:1234567891011121314151617181920212223moon.alpha = 0.0UIView.animateKeyframesWithDuration(5, delay: 0.0, options: [.CalculationModeCubic, .Repeat], animations: &#123;    UIView.addKeyframeWithRelativeStartTime(0.0, relativeDuration: 0.25, animations: &#123;        self.moon.alpha = 0.5        self.moon.center.x += self.view.frame.size.width / 4.0        self.moon.center.y -= 80    &#125;)    UIView.addKeyframeWithRelativeStartTime(0.25, relativeDuration: 0.25, animations: &#123;        self.moon.alpha = 1.0        self.moon.center.x += self.view.frame.size.width / 4.0        self.moon.center.y -= 20    &#125;)    UIView.addKeyframeWithRelativeStartTime(0.5, relativeDuration: 0.25, animations: &#123;        self.moon.center.x += self.view.frame.size.width / 4.0        self.moon.center.y += 20    &#125;)    UIView.addKeyframeWithRelativeStartTime(0.75, relativeDuration: 0.25, animations: &#123;        self.moon.alpha = 0.0        self.moon.center.x += self.view.frame.size.width / 4.0        self.moon.center.y += 80    &#125;)&#125;, completion: nil)\n","dateCreated":"2018-09-19T15:03:53-07:00","dateModified":"2018-09-19T15:07:31-07:00","datePublished":"2018-09-19T15:03:53-07:00","description":"When a view has several stages of moving animation, it is complicated to use animateWithDuration to implement the animation because it will contain nasty nesting in your code.","headline":"iOS Animation - Understanding UIView.Keyframe","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2018/09/19/ios-animation-4/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2018/09/19/ios-animation-4/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
+    <meta name="description" content="When a view has several stages of moving animation, it is complicated to use animateWithDuration to implement the animation because it will contain nasty nesting in your code.">
+<meta name="keywords" content="iOS Animation,Swift">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="ios-animation-4">
+<meta property="og:title" content="iOS Animation - Understanding UIView.Keyframe">
 <meta property="og:url" content="https://jasonhan1990.github.io/2018/09/19/ios-animation-4/index.html">
 <meta property="og:site_name" content="JasonH&#39;s Blog">
-<meta property="og:description" content="Juncheng Han">
+<meta property="og:description" content="When a view has several stages of moving animation, it is complicated to use animateWithDuration to implement the animation because it will contain nasty nesting in your code.">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-09-19T22:03:53.618Z">
+<meta property="og:image" content="https://jasonhan1990.github.io/2018/09/19/ios-animation-4/C4-1.gif">
+<meta property="og:image" content="https://jasonhan1990.github.io/2018/09/19/ios-animation-4/C4-2.jpeg">
+<meta property="og:updated_time" content="2018-09-19T22:07:31.545Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ios-animation-4">
-<meta name="twitter:description" content="Juncheng Han">
+<meta name="twitter:title" content="iOS Animation - Understanding UIView.Keyframe">
+<meta name="twitter:description" content="When a view has several stages of moving animation, it is complicated to use animateWithDuration to implement the animation because it will contain nasty nesting in your code.">
+<meta name="twitter:image" content="https://jasonhan1990.github.io/2018/09/19/ios-animation-4/C4-1.gif">
     
     
         
@@ -34,6 +38,9 @@
     
         <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
     
+    
+        <meta property="og:image" content="https://jasonhan1990.github.ioSwift.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioSwift.png" />
     
     
     
@@ -224,10 +231,10 @@
 <article class="post">
     
     
-        <div class="post-header main-content-wrap text-left">
+        <div class="post-header main-content-wrap text-center">
     
         <h1 class="post-title">
-            ios-animation-4
+            iOS Animation - Understanding UIView.Keyframe
         </h1>
     
     
@@ -238,6 +245,12 @@
     	
     </time>
     
+        <span>in </span>
+        
+    <a class="category-link" href="../../../../categories/iOS/">iOS</a>
+
+
+    
 </div>
 
     
@@ -246,12 +259,34 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            
+            <p>When a view has several stages of moving animation, it is complicated to use animateWithDuration to implement the animation because it will contain nasty nesting in your code.<br><a id="more"></a><br>However, Keyframe animation can solve the problem in an easy way. In UIView, there are two methods. </p>
+<ul>
+<li><code>animateKeyframesWithDuration:delay:options:animations:completion:</code></li>
+<li><code>addKeyframeWithRelativeStartTime:relativeDuration:animations:</code></li>
+</ul>
+<p>The first one creates an animation block object that can be used to set up keyframe-based animations for the current view. Well, the second one specifies the timing and animation values for a single frame of a keyframe animation.</p>
+<p>The parameters in animateKeyframesWithDuration are easy to understand, but the parameters in addKeyframeWithRelativeStartTime are needed to take carefully.<br>In addKeyframeWithRelativeStartTime:</p>
+<ul>
+<li><p><code>frameStartTime:</code> The time at which to start the specified animations. This value must be in the range 0 to 1. The value is the percentage of the total duration time. If the total duration is 2 sec and the frameStartTime is 0.5, then the real starting time is at 1 sec.</p>
+</li>
+<li><p><code>frameDuration:</code> The length of time over which to animate to the specified value. This value must be in the range 0 to 1. The value is the percentage of the total duration time. If the total duration is 10 sec and the frameDuration is 0.25, then the real duration of this animation stage is 2.5 sec.</p>
+</li>
+</ul>
+<p>Okey, let try to do this animation using keyframe animation.<br><div class="figure center image" style="width:;"><img class="fig-img" src="C4-1.gif" alt="Image-1"><span class="caption">Image-1</span></div><br>The stages of the moon rising and falling look like this:<br><div class="figure center image" style="width:;"><img class="fig-img" src="C4-2.jpeg" alt="Image-2"><span class="caption">Image-2</span></div><br>I used four stages. On X-axis, each stage moving length for the moon is identical which is a quarter of superview.width. On Y-axis, the moon climbs higher at the beginning of rising which means moon.y will minus a larger number in the first stage than in the second stage. For falling, it is the opposite of rising. To make the moon move smoothly, I choose CalculationModeCubic for the keyframe animation option.</p>
+<p>Here is the code:<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">moon.alpha = <span class="number">0.0</span></span><br><span class="line"></span><br><span class="line"><span class="type">UIView</span>.animateKeyframesWithDuration(<span class="number">5</span>, delay: <span class="number">0.0</span>, options: [.<span class="type">CalculationModeCubic</span>, .<span class="type">Repeat</span>], animations: &#123;</span><br><span class="line">    <span class="type">UIView</span>.addKeyframeWithRelativeStartTime(<span class="number">0.0</span>, relativeDuration: <span class="number">0.25</span>, animations: &#123;</span><br><span class="line">        <span class="keyword">self</span>.moon.alpha = <span class="number">0.5</span></span><br><span class="line">        <span class="keyword">self</span>.moon.center.x += <span class="keyword">self</span>.view.frame.size.width / <span class="number">4.0</span></span><br><span class="line">        <span class="keyword">self</span>.moon.center.y -= <span class="number">80</span></span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="type">UIView</span>.addKeyframeWithRelativeStartTime(<span class="number">0.25</span>, relativeDuration: <span class="number">0.25</span>, animations: &#123;</span><br><span class="line">        <span class="keyword">self</span>.moon.alpha = <span class="number">1.0</span></span><br><span class="line">        <span class="keyword">self</span>.moon.center.x += <span class="keyword">self</span>.view.frame.size.width / <span class="number">4.0</span></span><br><span class="line">        <span class="keyword">self</span>.moon.center.y -= <span class="number">20</span></span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="type">UIView</span>.addKeyframeWithRelativeStartTime(<span class="number">0.5</span>, relativeDuration: <span class="number">0.25</span>, animations: &#123;</span><br><span class="line">        <span class="keyword">self</span>.moon.center.x += <span class="keyword">self</span>.view.frame.size.width / <span class="number">4.0</span></span><br><span class="line">        <span class="keyword">self</span>.moon.center.y += <span class="number">20</span></span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="type">UIView</span>.addKeyframeWithRelativeStartTime(<span class="number">0.75</span>, relativeDuration: <span class="number">0.25</span>, animations: &#123;</span><br><span class="line">        <span class="keyword">self</span>.moon.alpha = <span class="number">0.0</span></span><br><span class="line">        <span class="keyword">self</span>.moon.center.x += <span class="keyword">self</span>.view.frame.size.width / <span class="number">4.0</span></span><br><span class="line">        <span class="keyword">self</span>.moon.center.y += <span class="number">80</span></span><br><span class="line">    &#125;)</span><br><span class="line">&#125;, completion: <span class="literal">nil</span>)</span><br></pre></td></tr></table></figure></p>
+
             
 
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS-Animation/">iOS Animation</a>
+
+            </div>
         
         
             <div class="post-actions-wrap">
@@ -310,13 +345,11 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=ios-animation-4" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=iOS Animation - Understanding UIView.Keyframe" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
         
-        
-            
         
         <li class="post-action">
             
@@ -330,8 +363,6 @@
 
 
         
-        
-            
         
     </div>
 </article>
@@ -403,13 +434,11 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=ios-animation-4" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=iOS Animation - Understanding UIView.Keyframe" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
         
-        
-            
         
         <li class="post-action">
             
@@ -454,7 +483,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=ios-animation-4">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/09/19/ios-animation-4/&amp;title=iOS Animation - Understanding UIView.Keyframe">
                     <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
                 </a>
             </li>
@@ -508,8 +537,6 @@
         <!--SCRIPTS-->
 <script src="../../../../assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
 <!--SCRIPTS END-->
-
-    
 
 
 
