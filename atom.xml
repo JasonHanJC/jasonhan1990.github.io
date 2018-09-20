@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://jasonhan1990.github.io/"/>
-  <updated>2018-09-20T22:48:11.005Z</updated>
+  <updated>2018-09-20T23:38:59.474Z</updated>
   <id>https://jasonhan1990.github.io/</id>
   
   <author>
@@ -17,11 +17,37 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Create Thumbnail For Video</title>
+    <link href="https://jasonhan1990.github.io/2018/09/20/create-thumbnail-for-video/"/>
+    <id>https://jasonhan1990.github.io/2018/09/20/create-thumbnail-for-video/</id>
+    <published>2018-09-20T23:18:05.000Z</published>
+    <updated>2018-09-20T23:38:59.474Z</updated>
+    
+    <content type="html"><![CDATA[<p>Here is how to create thumbnail for videos. Two steps:<br><a id="more"></a></p><ol><li>Use <code>AVURLAsset</code> to access to the video file by URL. Then use <code>AVAssetImageGenerator</code> to generate an image of one frame.</li><li>To distinguish the image we generated from normal images, add a play icon on the top of the image by merging two UIImage .</li></ol><p>Code:</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="built_in">UIImage</span> *)createVideoThumbnailWithPath:(<span class="built_in">NSString</span> *)videoPath &#123;</span><br><span class="line">    <span class="keyword">if</span> (!videoPath)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">AVURLAsset</span> *asset = [[<span class="built_in">AVURLAsset</span> alloc] initWithURL:[<span class="built_in">NSURL</span> fileURLWithPath:videoPath] options:<span class="literal">nil</span>];</span><br><span class="line">    <span class="built_in">AVAssetImageGenerator</span> *imgGenerator = [[<span class="built_in">AVAssetImageGenerator</span> alloc] initWithAsset:asset];</span><br><span class="line">    imgGenerator.appliesPreferredTrackTransform = <span class="literal">YES</span>;</span><br><span class="line">    imgGenerator.apertureMode = <span class="built_in">AVAssetImageGeneratorApertureModeEncodedPixels</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// create CGImage</span></span><br><span class="line">    <span class="built_in">CGImageRef</span> thumbnailImgRef = <span class="literal">nil</span>;</span><br><span class="line">    <span class="comment">// the time frame</span></span><br><span class="line">    <span class="built_in">CFTimeInterval</span> thumbnailImageTime = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// get the image</span></span><br><span class="line">    thumbnailImgRef = [imgGenerator copyCGImageAtTime:<span class="built_in">CMTimeMake</span>(thumbnailImageTime, <span class="number">60</span>) actualTime:<span class="literal">nil</span> error:&amp;error];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// error handling</span></span><br><span class="line">    <span class="keyword">if</span> (!thumbnailImgRef)</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"VIDEO THUMBNAIL ERROR: %@"</span>, error);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// convert to UIImage</span></span><br><span class="line">    <span class="built_in">UIImage</span> *image = thumbnailImgRef ? [[<span class="built_in">UIImage</span> alloc] initWithCGImage:thumbnailImgRef] : <span class="literal">nil</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// add playIcon</span></span><br><span class="line">    <span class="keyword">if</span> (image) &#123;</span><br><span class="line">        <span class="comment">// grab your play icon</span></span><br><span class="line">        <span class="built_in">UIImage</span> *playIcon = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@"PlayIcon"</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// start image context</span></span><br><span class="line">        <span class="built_in">UIGraphicsBeginImageContext</span>(image.size);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// add original image first with existing opacity</span></span><br><span class="line">        [image drawInRect:<span class="built_in">CGRectMake</span>(<span class="number">0</span>,<span class="number">0</span>,image.size.width,image.size.height)];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// add play icon over the image in the middle with supplied opacity if applicable</span></span><br><span class="line">        [playIcon drawInRect:<span class="built_in">CGRectMake</span>((image.size.width - playIcon.size.width) / <span class="number">2.0</span>,</span><br><span class="line">                                        (image.size.height - playIcon.size.height) / <span class="number">2.0</span>,</span><br><span class="line">                                        playIcon.size.width,playIcon.size.height)</span><br><span class="line">                   blendMode:kCGBlendModeNormal</span><br><span class="line">                       alpha:<span class="number">0.9</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// get merged image</span></span><br><span class="line">        <span class="built_in">UIImage</span> *newImage = <span class="built_in">UIGraphicsGetImageFromCurrentImageContext</span>();</span><br><span class="line"></span><br><span class="line">        <span class="built_in">UIGraphicsEndImageContext</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> newImage;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> image;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Here is how to create thumbnail for videos. Two steps:&lt;br&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/tags/iOS/"/>
+    
+      <category term="Code Snippet" scheme="https://jasonhan1990.github.io/tags/Code-Snippet/"/>
+    
+      <category term="Objc" scheme="https://jasonhan1990.github.io/tags/Objc/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family</title>
     <link href="https://jasonhan1990.github.io/2018/09/20/error-record-1/"/>
     <id>https://jasonhan1990.github.io/2018/09/20/error-record-1/</id>
     <published>2018-09-20T22:37:06.000Z</published>
-    <updated>2018-09-20T22:48:11.005Z</updated>
+    <updated>2018-09-20T23:16:52.036Z</updated>
     
     <content type="html"><![CDATA[<p>I got this error because I mistyped the <strong>Link</strong> to <strong>link</strong>.<br><a id="more"></a><br><div class="figure center" style="width:;"><a class="fancybox" href="e1-1.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="e1-1.png" alt=""></a></div></p><p>So two rules that Xcode determine a method is an init method:</p><ol><li>return <code>instancetype</code> or <code>id</code></li><li>the method name should be a capital letter followed by <code>init</code>. </li></ol><p>For example:</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (intancetype)initWithImage:(<span class="built_in">UIImage</span> *)image;</span><br></pre></td></tr></table></figure>]]></content>
     
@@ -36,9 +62,9 @@
     
       <category term="iOS" scheme="https://jasonhan1990.github.io/tags/iOS/"/>
     
-      <category term="Error" scheme="https://jasonhan1990.github.io/tags/Error/"/>
-    
       <category term="Objc" scheme="https://jasonhan1990.github.io/tags/Objc/"/>
+    
+      <category term="Error" scheme="https://jasonhan1990.github.io/tags/Error/"/>
     
   </entry>
   
