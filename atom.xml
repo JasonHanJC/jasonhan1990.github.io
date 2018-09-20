@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://jasonhan1990.github.io/"/>
-  <updated>2018-09-20T19:40:40.605Z</updated>
+  <updated>2018-09-20T22:48:11.005Z</updated>
   <id>https://jasonhan1990.github.io/</id>
   
   <author>
@@ -15,6 +15,58 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family</title>
+    <link href="https://jasonhan1990.github.io/2018/09/20/error-record-1/"/>
+    <id>https://jasonhan1990.github.io/2018/09/20/error-record-1/</id>
+    <published>2018-09-20T22:37:06.000Z</published>
+    <updated>2018-09-20T22:48:11.005Z</updated>
+    
+    <content type="html"><![CDATA[<p>I got this error because I mistyped the <strong>Link</strong> to <strong>link</strong>.<br><a id="more"></a><br><div class="figure center" style="width:;"><a class="fancybox" href="e1-1.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="e1-1.png" alt=""></a></div></p><p>So two rules that Xcode determine a method is an init method:</p><ol><li>return <code>instancetype</code> or <code>id</code></li><li>the method name should be a capital letter followed by <code>init</code>. </li></ol><p>For example:</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (intancetype)initWithImage:(<span class="built_in">UIImage</span> *)image;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;I got this error because I mistyped the &lt;strong&gt;Link&lt;/strong&gt; to &lt;strong&gt;link&lt;/strong&gt;.&lt;br&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/tags/iOS/"/>
+    
+      <category term="Error" scheme="https://jasonhan1990.github.io/tags/Error/"/>
+    
+      <category term="Objc" scheme="https://jasonhan1990.github.io/tags/Objc/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>GCD Note 2</title>
+    <link href="https://jasonhan1990.github.io/2018/09/20/gcd-note-2/"/>
+    <id>https://jasonhan1990.github.io/2018/09/20/gcd-note-2/</id>
+    <published>2018-09-20T22:14:07.000Z</published>
+    <updated>2018-09-20T22:25:42.870Z</updated>
+    
+    <content type="html"><![CDATA[<p>Continue after <a href="/2018/09/19/gcd-note-1">GCD Note 1</a>.<br><a id="more"></a></p><h2 id="dispatch-after"><a href="#dispatch-after" class="headerlink" title="dispatch_after"></a>dispatch_after</h2><p>The method dispatch_after works like a delayed dispatch_async. The dispatch_after() function submits the block to the given queue at the time specified by the when parameter.</p><p>Example:</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, <span class="number">2</span> * <span class="built_in">NSEC_PER_SEC</span>);</span><br><span class="line">dispatch_after(delay, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">   <span class="comment">//do something on main thread after 2 sec</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><h2 id="dispatch-group"><a href="#dispatch-group" class="headerlink" title="dispatch group"></a>dispatch group</h2><p>Dispatch group is used to do some updates after a group of tasks. The tasks in the group can be either asynchronous or synchronous. To create a group:</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dispatch_group_t group = dispatch_group_create();</span><br></pre></td></tr></table></figure><p>There are two ways to add tasks to the group. The first way is adding a block of code to the group, and executing on a specified queue like globe queue:</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">dispatch_group_async(group,specifiedQueue,^&#123;</span><br><span class="line">    <span class="comment">// do something 1 here</span></span><br><span class="line">&#125;);</span><br><span class="line">dispatch_group_async(group,specifiedQueue,^&#123;</span><br><span class="line">    <span class="comment">// do something 2 here</span></span><br><span class="line">&#125;);</span><br><span class="line">...</span><br></pre></td></tr></table></figure><p>But this is not suitable for something you want to have callback straight away. </p><p>The second way is to set starting and ending manually by using <code>dispatch_group_enter()</code> and <code>dispatch_group_leaving()</code>.</p><p>Suppose we need to download an image with its thumbnail and the original image from a server with different URLs.</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">dispatch_group_t group = dispatch_group_create();</span><br><span class="line"><span class="keyword">for</span> (<span class="built_in">NSInteger</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">    <span class="built_in">NSURL</span> *url;</span><br><span class="line">    <span class="keyword">switch</span> (i) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0</span>:</span><br><span class="line">              url = [<span class="built_in">NSURL</span> URLWithString:thumbnailURLString];</span><br><span class="line">              <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">              url = [<span class="built_in">NSURL</span> URLWithString:orignalURLString];</span><br><span class="line">              <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">              <span class="keyword">break</span>;</span><br><span class="line">     &#125;</span><br><span class="line">    dispatch_group_enter(group);</span><br><span class="line">    <span class="built_in">UIImage</span> *image = [ImageDownloader alloc] initWithURL: url withCompletion:^(<span class="built_in">NSError</span> *error) &#123;</span><br><span class="line">        <span class="keyword">if</span> (error) &#123;</span><br><span class="line">            <span class="comment">// handle the error</span></span><br><span class="line">        &#125;</span><br><span class="line">        dispatch_grounp_leave(group);</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// store the images some where</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>Notice that the number of enter should be equal to the number of leave. </p><p>Then, how to notify that the group is finished. There are also two ways. First one, using <code>dispatch_group_wait()</code>.</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dispatch_group_wait(dispatch_group_t group, dispatch_time_t timeout);</span><br><span class="line"><span class="comment">// do something after group is finished</span></span><br></pre></td></tr></table></figure><p>This method will return a long value if the time expired before all tasks are finished, and it will block the current thread.</p><p>The second way is to use <code>dispatch_group_notify()</code>:</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dispatch_group_notify(dispatch_group_t group, specifiedQueue,^&#123;</span><br><span class="line">    <span class="comment">// do something here on the specifiedQueue</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><p>The <code>dispatch_group_notify()</code> function provides asynchronous notification of the completion of the blocks associated with the group by submitting the block to the specified queue once all blocks associated with the group have completed.</p><p>The original post is on October 31, 2016</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Continue after &lt;a href=&quot;/2018/09/19/gcd-note-1&quot;&gt;GCD Note 1&lt;/a&gt;.&lt;br&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/tags/iOS/"/>
+    
+      <category term="Objc" scheme="https://jasonhan1990.github.io/tags/Objc/"/>
+    
+      <category term="GCD" scheme="https://jasonhan1990.github.io/tags/GCD/"/>
+    
+  </entry>
   
   <entry>
     <title>Why strongSelf and weakSelf?</title>
@@ -64,9 +116,9 @@
     
       <category term="iOS" scheme="https://jasonhan1990.github.io/tags/iOS/"/>
     
-      <category term="GCD" scheme="https://jasonhan1990.github.io/tags/GCD/"/>
-    
       <category term="Objc" scheme="https://jasonhan1990.github.io/tags/Objc/"/>
+    
+      <category term="GCD" scheme="https://jasonhan1990.github.io/tags/GCD/"/>
     
   </entry>
   
