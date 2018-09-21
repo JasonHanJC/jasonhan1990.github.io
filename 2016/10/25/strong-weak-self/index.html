@@ -1,0 +1,577 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="JasonH&#39;s Blog">
+    <title>Why strongSelf and weakSelf? - JasonH&#39;s Blog</title>
+    <meta name="author" content="Juncheng Han">
+    
+    
+        <link rel="icon" href="https://jasonhan1990.github.io../../../../assets/images/JASONlogo-w.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.So, a retain cycle usually occurs when an object A has a strong reference to Object B, and Object B also has a strong reference to Object A. Under this situation, the retainCount for both objects can not be 0, so the memory for these two objects won’t be released. This is the memory leak. The retain cycle could happen between multiple objects as long as their references between each other form a cycle.Retain cycle 1Also, an object can have a reference of itself which will cause retain cycle too. The most common situation is that an object owns a block, and in the block, we call any of this object’s methods or properties. Then the block has a reference to this object itself, which cause a retain cycle. Notice that blocks maintain strong references to any captured objects, including self, because they don’t want data be destroyed by ARC before themselves getting executed.Retain cycle 2\nExample 1:I have an object called Car. Car has a block called drive.\n12345678// car.h#import &lt;Foundation/Foundation.h&gt;typedef void(^Drive)();@interface Car : NSObject@property (nonatomic, copy) NSString *miles;@property (nonatomic, copy) Drive drive;@end\nIn the viewController.\n12345678910111213141516171819202122#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    car.drive = ^&#123;        NSLog(@\"Car drived %@\", car.miles);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nLeak! Here, the car has a strong reference to the drive block, and in the block, the block has a strong reference to the car since we called car.miles. This made the car has a reference to itself.\nUsing Instruments to detect the leak. Click the red cross. Malloc 48 Bytes means the system allocate 48 Bytes of memory to the block.\n\nOpen Cycles &amp; Roots. You can see the cycle.\nno ivar: Instruments can't find the variable name that allocated the memory so you get the [no ivar] message.\nChange the Example 1 to Example 2.\nExample 2:I pass a parameter into the block. Leak?\n12345678910111213141516171819202122#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    car.drive = ^(NSString *miles)&#123;        NSLog(@\"Car drived %@\", miles);    &#125;;    car.drive(car.miles);    NSLog(@\"return\");&#125;@end\nNo Leak. Checking the leak with instruments:\n\nSince I pass the car.miles into the block as a parameter, and the block won’t retain the parameter, there will be no retain cycle.\nWEAKSELF AND STRONGSELFweakSelfHow to create a weakSelf? There are two ways.\n12__weak __typeof(self) weakSelf = self; // Write this code every time before you use weakself.\n12#define WEAKSELF typeof(self) __ weak weakSelf = self  // Or create a macro in header file, then you can use WEAKSELF everywhere.\nThe reason we use weakSelf in a block is that with weak property, the block won’t retain the object in the block. Then we break the cycle. For example 1, we can use weakself to solve the retain cycle problem.\n1234567891011121314151617181920212223#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        NSLog(@\"Car drived %@\", weakCar.miles);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nstrongSelf1__strong __typeof(weakSelf) strongSelf = weakSelf;\n1#define STRONGSELF typeof(weakSelf) __strong strongSelf = weakSelf\nSince we use weakSelf in the block to prevent the retain cycle problem, there is a potential problem that the object could be released before the block has been executed. \nexample 3:123456789101112131415161718192021222324#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^&#123;            NSLog(@\"Car drived %@\", weakCar.miles);        &#125;);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nI add a delay before executing the NSlog(). Then the output is:... 15:28:20.875923 BlockTest[7630:4429580] return\n... 15:28:23.065725 BlockTest[7630:4429580] Car drived (null)\nWhat is happening here? The dispatch_after() function submits the block (which contains NSLog()) to the given queue (Here is the main queue) at the time specified by the when (Here is after 2 sec) parameter. Think the block as a task. The dispatch_after() asynchronously add the task to the main queue after two sec when you execute the study block. Since the study block has a weak reference to the car, after the study block has been execute (car.drive() is called), the weakCar is released by ARC, then the weak object will be set as nil. However, the dispatch block is still not executed. That is why we got null in the output.\nSo, we add strongSelf in the block which prevent the object will not be released inside the block. After the block is executed, strongSelf then release.\n1234567891011121314151617181920212223242526#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        __strong __typeof(weakCar) strongCar = weakCar;        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^&#123;            NSLog(@\"Car drived %@\", strongCar.miles);        &#125;);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end","dateCreated":"2016-10-25T19:51:16-07:00","dateModified":"2018-09-20T17:20:19-07:00","datePublished":"2016-10-25T19:51:16-07:00","description":"Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.","headline":"Why strongSelf and weakSelf?","image":["sws.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/10/25/strong-weak-self/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/10/25/strong-weak-self/","keywords":"iOS Animation, Objc, Memory Leak, Retain Cycle","thumbnailUrl":"sws.png"}</script>
+    <meta name="description" content="Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.">
+<meta name="keywords" content="iOS Animation,Objc,Memory Leak,Retain Cycle">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Why strongSelf and weakSelf?">
+<meta property="og:url" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/index.html">
+<meta property="og:site_name" content="JasonH&#39;s Blog">
+<meta property="og:description" content="Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-1.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-2.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-3.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-4.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-5.png">
+<meta property="og:updated_time" content="2018-09-21T00:20:19.677Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Why strongSelf and weakSelf?">
+<meta name="twitter:description" content="Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.">
+<meta name="twitter:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-1.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.iosws.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.iosws.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="../../../../assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-126130510-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="../../../../ ">JasonH&#39;s Blog</a>
+    </div>
+    
+        
+            <a  class="header-right-icon "
+                href="#about">
+        
+        
+            <i class="avatar.jpg fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="../../../../#about">
+                    <img class="sidebar-profile-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Juncheng Han</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../projects"
+                            
+                            title="Projects"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-box" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Projects</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail">
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé">
+                    
+                        <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Résumé</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Why strongSelf and weakSelf?
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2016-10-25T19:51:16-07:00">
+	
+		    Oct 25, 2016
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="../../../../categories/iOS/">iOS</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            
+            <p>Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.<br><a id="more"></a><br>So, a retain cycle usually occurs when an object A has a strong reference to Object B, and Object B also has a strong reference to Object A. Under this situation, the retainCount for both objects can not be 0, so the memory for these two objects won’t be released. This is the memory leak. The retain cycle could happen between multiple objects as long as their references between each other form a cycle.<br><div class="figure center" style="width:;"><a class="fancybox" href="strong-weak-self-1.png" title="Retain cycle 1" data-caption="Retain cycle 1" data-fancybox="default"><img class="fig-img" src="strong-weak-self-1.png" alt="Retain cycle 1"></a><span class="caption">Retain cycle 1</span></div><br>Also, an object can have a reference of itself which will cause retain cycle too. The most common situation is that an object owns a block, and in the block, we call any of this object’s methods or properties. Then the block has a reference to this object itself, which cause a retain cycle. Notice that blocks maintain strong references to any captured objects, including self, because they don’t want data be destroyed by ARC before themselves getting executed.<br><div class="figure center" style="width:;"><a class="fancybox" href="strong-weak-self-2.png" title="Retain cycle 2" data-caption="Retain cycle 2" data-fancybox="default"><img class="fig-img" src="strong-weak-self-2.png" alt="Retain cycle 2"></a><span class="caption">Retain cycle 2</span></div></p>
+<h4 id="Example-1"><a href="#Example-1" class="headerlink" title="Example 1:"></a>Example 1:</h4><p>I have an object called Car. Car has a block called drive.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// car.h</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span>(^Drive)();</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Car</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *miles;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) Drive drive;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>In the viewController.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"Car.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    Car *car = [[Car alloc]init];</span><br><span class="line">    car.miles = <span class="string">@"100 miles"</span>;</span><br><span class="line"></span><br><span class="line">    car.drive = ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Car drived %@"</span>, car.miles);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    car.drive();</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"return"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>Leak! Here, the car has a strong reference to the drive block, and in the block, the block has a strong reference to the car since we called car.miles. This made the car has a reference to itself.</p>
+<p>Using Instruments to detect the leak. Click the red cross. Malloc 48 Bytes means the system allocate 48 Bytes of memory to the block.</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="strong-weak-self-3.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="strong-weak-self-3.png" alt=""></a></div>
+<p>Open Cycles &amp; Roots. You can see the cycle.</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="strong-weak-self-4.png" title="no ivar: Instruments can't find the variable name that allocated the memory so you get the [no ivar] message." data-caption="no ivar: Instruments can't find the variable name that allocated the memory so you get the [no ivar] message." data-fancybox="default"><img class="fig-img" src="strong-weak-self-4.png" alt="no ivar: Instruments can't find the variable name that allocated the memory so you get the [no ivar] message."></a><span class="caption">no ivar: Instruments can't find the variable name that allocated the memory so you get the [no ivar] message.</span></div>
+<p>Change the Example 1 to Example 2.</p>
+<h4 id="Example-2"><a href="#Example-2" class="headerlink" title="Example 2:"></a>Example 2:</h4><p>I pass a parameter into the block. Leak?</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"Car.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    Car *car = [[Car alloc]init];</span><br><span class="line">    car.miles = <span class="string">@"100 miles"</span>;</span><br><span class="line"></span><br><span class="line">    car.drive = ^(<span class="built_in">NSString</span> *miles)&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Car drived %@"</span>, miles);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    car.drive(car.miles);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"return"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>No Leak. Checking the leak with instruments:</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="strong-weak-self-5.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="strong-weak-self-5.png" alt=""></a></div>
+<p>Since I pass the car.miles into the block as a parameter, and the block won’t retain the parameter, there will be no retain cycle.</p>
+<h3 id="WEAKSELF-AND-STRONGSELF"><a href="#WEAKSELF-AND-STRONGSELF" class="headerlink" title="WEAKSELF AND STRONGSELF"></a>WEAKSELF AND STRONGSELF</h3><h4 id="weakSelf"><a href="#weakSelf" class="headerlink" title="weakSelf"></a>weakSelf</h4><p>How to create a weakSelf? There are two ways.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__<span class="keyword">weak</span> __<span class="keyword">typeof</span>(<span class="keyword">self</span>) weakSelf = <span class="keyword">self</span>; </span><br><span class="line"><span class="comment">// Write this code every time before you use weakself.</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define WEAKSELF typeof(self) __ weak weakSelf = self  </span></span><br><span class="line"><span class="comment">// Or create a macro in header file, then you can use WEAKSELF everywhere.</span></span><br></pre></td></tr></table></figure>
+<p>The reason we use weakSelf in a block is that with weak property, the block won’t retain the object in the block. Then we break the cycle. For example 1, we can use weakself to solve the retain cycle problem.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"Car.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    Car *car = [[Car alloc]init];</span><br><span class="line">    car.miles = <span class="string">@"100 miles"</span>;</span><br><span class="line"></span><br><span class="line">    __<span class="keyword">weak</span> __<span class="keyword">typeof</span>(car) weakCar = car;</span><br><span class="line">    car.drive = ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Car drived %@"</span>, weakCar.miles);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    car.drive();</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"return"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<h4 id="strongSelf"><a href="#strongSelf" class="headerlink" title="strongSelf"></a>strongSelf</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__<span class="keyword">strong</span> __<span class="keyword">typeof</span>(weakSelf) strongSelf = weakSelf;</span><br></pre></td></tr></table></figure>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define STRONGSELF typeof(weakSelf) __strong strongSelf = weakSelf</span></span><br></pre></td></tr></table></figure>
+<p>Since we use weakSelf in the block to prevent the retain cycle problem, there is a potential problem that the object could be released before the block has been executed. </p>
+<h4 id="example-3"><a href="#example-3" class="headerlink" title="example 3:"></a>example 3:</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"Car.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    Car *car = [[Car alloc]init];</span><br><span class="line">    car.miles = <span class="string">@"100 miles"</span>;</span><br><span class="line"></span><br><span class="line">    __<span class="keyword">weak</span> __<span class="keyword">typeof</span>(car) weakCar = car;</span><br><span class="line">    car.drive = ^&#123;</span><br><span class="line">        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(<span class="number">2.0</span> * <span class="built_in">NSEC_PER_SEC</span>)), dispatch_get_main_queue(), ^&#123;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"Car drived %@"</span>, weakCar.miles);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line">    car.drive();</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"return"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>I add a delay before executing the NSlog(). Then the output is:<br><code>... 15:28:20.875923 BlockTest[7630:4429580] return
+... 15:28:23.065725 BlockTest[7630:4429580] Car drived (null)</code></p>
+<p>What is happening here? The dispatch_after() function submits the block (which contains NSLog()) to the given queue (Here is the main queue) at the time specified by the when (Here is after 2 sec) parameter. Think the block as a task. The dispatch_after() asynchronously add the task to the main queue after two sec when you execute the study block. Since the study block has a weak reference to the car, after the study block has been execute (car.drive() is called), the weakCar is released by ARC, then the weak object will be set as nil. However, the dispatch block is still not executed. That is why we got null in the output.</p>
+<p>So, we add strongSelf in the block which prevent the object will not be released inside the block. After the block is executed, strongSelf then release.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"Car.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line"></span><br><span class="line">    Car *car = [[Car alloc]init];</span><br><span class="line">    car.miles = <span class="string">@"100 miles"</span>;</span><br><span class="line"></span><br><span class="line">    __<span class="keyword">weak</span> __<span class="keyword">typeof</span>(car) weakCar = car;</span><br><span class="line">    car.drive = ^&#123;</span><br><span class="line">        __<span class="keyword">strong</span> __<span class="keyword">typeof</span>(weakCar) strongCar = weakCar;</span><br><span class="line">        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(<span class="number">2.0</span> * <span class="built_in">NSEC_PER_SEC</span>)), dispatch_get_main_queue(), ^&#123;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"Car drived %@"</span>, strongCar.miles);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    car.drive();</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"return"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+            
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Memory-Leak/">Memory Leak</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Retain-Cycle/">Retain Cycle</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS-Animation/">iOS Animation</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../31/gcd-note-2/" data-tooltip="GCD Note 2" aria-label="PREVIOUS: GCD Note 2">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../19/gcd-note-1/" data-tooltip="GCD Note 1" aria-label="NEXT: GCD Note 1">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/&amp;title=Why strongSelf and weakSelf?" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Juncheng Han. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../31/gcd-note-2/" data-tooltip="GCD Note 2" aria-label="PREVIOUS: GCD Note 2">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../19/gcd-note-1/" data-tooltip="GCD Note 1" aria-label="NEXT: GCD Note 1">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/&amp;title=Why strongSelf and weakSelf?" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/">
+                    <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2016/10/25/strong-weak-self/&amp;title=Why strongSelf and weakSelf?">
+                    <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Juncheng Han</h4>
+        
+            <div id="about-card-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>iOS and NodeJS Dev</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Sunnyvale, CA
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="../../../../assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<!--SCRIPTS END-->
+
+
+
+    </body>
+</html>
