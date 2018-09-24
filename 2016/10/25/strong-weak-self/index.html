@@ -48,7 +48,11 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/style-du2xmrqdqrl2ollgeiw050kpl6l4nbyz7bumjuurjgsxyopifvukebxc9lqe.min.css">
+    <link rel="stylesheet" href="../../../../assets/css/all.css">
+    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -244,6 +248,7 @@
                         hasCoverMetaIn
                         ">
                 
+
 <article class="post">
     
     
@@ -273,9 +278,10 @@
 </div>
 
     
+    <!-- projects grid -->
+    
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            
             <p>Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.<br><a id="more"></a><br>So, a retain cycle usually occurs when an object A has a strong reference to Object B, and Object B also has a strong reference to Object A. Under this situation, the retainCount for both objects can not be 0, so the memory for these two objects won’t be released. This is the memory leak. The retain cycle could happen between multiple objects as long as their references between each other form a cycle.<br><div class="figure center" style="width:;"><a class="fancybox" href="strong-weak-self-1.png" title="Retain cycle 1" data-caption="Retain cycle 1" data-fancybox="default"><img class="fig-img" src="strong-weak-self-1.png" alt="Retain cycle 1"></a><span class="caption">Retain cycle 1</span></div><br>Also, an object can have a reference of itself which will cause retain cycle too. The most common situation is that an object owns a block, and in the block, we call any of this object’s methods or properties. Then the block has a reference to this object itself, which cause a retain cycle. Notice that blocks maintain strong references to any captured objects, including self, because they don’t want data be destroyed by ARC before themselves getting executed.<br><div class="figure center" style="width:;"><a class="fancybox" href="strong-weak-self-2.png" title="Retain cycle 2" data-caption="Retain cycle 2" data-fancybox="default"><img class="fig-img" src="strong-weak-self-2.png" alt="Retain cycle 2"></a><span class="caption">Retain cycle 2</span></div></p>
 <h4 id="Example-1"><a href="#Example-1" class="headerlink" title="Example 1:"></a>Example 1:</h4><p>I have an object called Car. Car has a block called drive.</p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// car.h</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span>(^Drive)();</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Car</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *miles;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) Drive drive;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
@@ -398,8 +404,6 @@
         
     </div>
 </article>
-
-
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
@@ -568,7 +572,10 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="../../../../assets/js/script-vufjrm3fmbuttogo1hxuu0w9w0sesk5iyysjuguc2hdhufot9szxg8twijry.min.js"></script>
+<script src="../../../../assets/js/jquery.js"></script>
+<script src="../../../../assets/js/jquery.fancybox.js"></script>
+<script src="../../../../assets/js/thumbs.js"></script>
+<script src="../../../../assets/js/tranquilpeak.js"></script>
 <!--SCRIPTS END-->
 
 
