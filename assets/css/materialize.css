@@ -272,6 +272,8 @@ video.responsive-video {
   }
   
   .row {
+    display: flex;
+  flex-wrap: wrap;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 20px;
