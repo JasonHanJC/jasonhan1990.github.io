@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="JasonH&#39;s Blog">
+    <title>User Signup Flow - JasonH&#39;s Blog</title>
+    <meta name="author" content="Juncheng Han">
+    
+    
+        <link rel="icon" href="/assets/images/favicn.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="../atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"Website","@id":"https://jasonhan1990.github.io","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"name":"JasonH's Blog","description":"Juncheng Han","url":"https://jasonhan1990.github.io"}</script>
+    <meta name="description" content="AboutThis is one part of my current work for the iOS app. It is a flow form for new user to submit some basic personal informations. I did the basic UI/UX part, because we don’t have a designer yet. S">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="User Signup Flow">
+<meta property="og:url" content="https://jasonhan1990.github.io/user-signup-flow/index.html">
+<meta property="og:site_name" content="JasonH&#39;s Blog">
+<meta property="og:description" content="AboutThis is one part of my current work for the iOS app. It is a flow form for new user to submit some basic personal informations. I did the basic UI/UX part, because we don’t have a designer yet. S">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://jasonhan1990.github.io/user-signup-flow/airbnb-1.png">
+<meta property="og:updated_time" content="2018-09-25T02:32:30.659Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="User Signup Flow">
+<meta name="twitter:description" content="AboutThis is one part of my current work for the iOS app. It is a flow form for new user to submit some basic personal informations. I did the basic UI/UX part, because we don’t have a designer yet. S">
+<meta name="twitter:image" content="https://jasonhan1990.github.io/user-signup-flow/airbnb-1.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.io../assets/images/avatar.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="../assets/css/all.css">
+    <link rel="stylesheet" href="../assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="../assets/css/thumbs.css">
+    <link rel="stylesheet" href="../assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="../assets/css/materialize.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-126130510-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="../ ">JasonH&#39;s Blog</a>
+    </div>
+    
+        
+            <a  class="header-right-icon "
+                href="#about">
+        
+        
+            <i class="avatar.jpg fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="../#about">
+                    <img class="sidebar-profile-picture" src="../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Juncheng Han</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../projects"
+                            
+                            title="Projects"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-th" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Projects</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail">
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé">
+                    
+                        <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Résumé</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            User Signup Flow
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2016-09-09T19:07:56-07:00">
+	
+		    Sep 09, 2016
+    	
+    </time>
+    
+</div>
+
+    
+</div>
+
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h3 id="About"><a href="#About" class="headerlink" title="About"></a>About</h3><p>This is one part of my current work for the iOS app. It is a flow form for new user to submit some basic personal informations. I did the basic UI/UX part, because we don’t have a designer yet. Some ideas are coming from Airbnb app. I really like it.</p>
+<p>During the research of Airbnb iOS app, I found their app has problem with calculating the real height of keyboard on screen when user use a bluetooth keyboard. But it is not a big problem(They have fixed the problem by making the bottom bar transparent. It is really nice). This feature right now only does information gathering job. I will integrate more features, like finding friends, subscribing official accounts, into this part in the future.</p>
+<div class="video-container"><iframe src="//player.vimeo.com/video/182934634" frameborder="0" allowfullscreen></iframe></div>
+<p>The whole process has five pages. The user profile needs several required fields such as display name, birthday and real name. So the first two pages are for required information. If user didn’t fill them out, the white circle next button can not be pressed. After first two pages, the interface will tell user that he/she can skip current page. </p>
+<p>i didn’t use navigation controller with five UIViewControllers, because I want to keep the bottom bar in the screen without transfer animation all the time. However, I did like the navigation transfer animation between pages, so I use <code>CATransition</code> to do the job:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Found firstView's index</span></span><br><span class="line"><span class="built_in">NSUInteger</span> i = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">while</span>([<span class="keyword">self</span>.view.subviews objectAtIndex:i] != firstView) &#123;</span><br><span class="line">    ++i;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Remove firstView</span></span><br><span class="line">[firstView removeFromSuperview];</span><br><span class="line"></span><br><span class="line"><span class="comment">// Inser secView at right index</span></span><br><span class="line">[<span class="keyword">self</span>.view insertSubview:secView atIndex:i];</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create the transition</span></span><br><span class="line"><span class="built_in">CATransition</span> *animation = [<span class="built_in">CATransition</span> animation];</span><br><span class="line"><span class="comment">// if you need delegate</span></span><br><span class="line">animation.delegate = <span class="keyword">self</span>;</span><br><span class="line">[animation setType:kCATransitionPush];</span><br><span class="line"><span class="keyword">if</span> (fromLeft) &#123;</span><br><span class="line">    [animation setSubtype:kCATransitionFromLeft];</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    [animation setSubtype:kCATransitionFromRight];</span><br><span class="line">&#125;</span><br><span class="line">[animation setDuration:<span class="number">0.4</span>];</span><br><span class="line">[animation setTimingFunction:[<span class="built_in">CAMediaTimingFunction</span> functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];</span><br><span class="line"></span><br><span class="line"><span class="comment">// add animation to the self.view</span></span><br><span class="line">[[<span class="keyword">self</span>.view layer] addAnimation:animation forKey:<span class="string">@"transferViews"</span>];</span><br></pre></td></tr></table></figure>
+<p>So, five pages (views) will be created at viewDidLoad, but only one of them will be added to the subview of the self.view at each time.</p>
+<p>There are two things I cared about when keyboard came out. One is the bottom bar’s location that it should be at the top of the keyboard. And another is that textfield or textView should not be hidden by the keyboard.</p>
+<p>So, I need to know when keyboard comes out and dismiss, and <strong>keyboard’s real height (not height got from notification, I will explain it)</strong> To do this, I need two notification: <code>UIKeyboardWillShowNotification</code> and <code>UIKeyboardWillHideNotification</code>.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(keyboardWillOpen:)</span><br><span class="line">                                             name:<span class="built_in">UIKeyboardWillShowNotification</span></span><br><span class="line">                                           object:<span class="literal">nil</span>];</span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(keyboardWillClose:)</span><br><span class="line">                                             name:<span class="built_in">UIKeyboardWillHideNotification</span></span><br><span class="line">                                           object:<span class="literal">nil</span>];</span><br></pre></td></tr></table></figure>
+<p>And when keyboard comes out, I need to get the keyboard’s real height by:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)keyboardWillOpen:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">    <span class="comment">// get info from notification</span></span><br><span class="line">    <span class="built_in">NSDictionary</span> *info = [notification userInfo];</span><br><span class="line">    <span class="comment">// get keyboard's Frame</span></span><br><span class="line">    <span class="built_in">CGRect</span> keyboardFrame = [info[<span class="built_in">UIKeyboardFrameEndUserInfoKey</span>] <span class="built_in">CGRectValue</span>];</span><br><span class="line">    <span class="comment">// get keyboard's Frame in current superview</span></span><br><span class="line">    keyboardFrame = [<span class="keyword">self</span>.view convertRect:keyboardFrame fromView:<span class="literal">nil</span>];</span><br><span class="line">    <span class="comment">// get y position</span></span><br><span class="line">    <span class="built_in">CGFloat</span> yPosition = keyboardFrame.origin.y;</span><br><span class="line">    <span class="comment">// get real height show in the view</span></span><br><span class="line">    <span class="built_in">NSInteger</span> height = [<span class="built_in">UIScreen</span> mainScreen].bounds.size.height - yPosition;</span><br><span class="line"></span><br><span class="line">     ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The reason I got height by calculating is that when user use a physical keyboard, the keyboard on screen will show only part of itself. This will happen on iPad devices. I will show you the picture of Airbnb app. No offense.</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="airbnb-1.png" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="airbnb-1.png" alt=""></a></div>
+<p>The first image shows the normal software keyboard. the bottom bar moves up properly. But, in the second picture with physical keyboard, the bottom bar moves up like the first one. And more problem, in the third picture, the bar block one part of this page leading weird looking. The reason for this is using the height from userInfo directly.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSDictionary</span> *info = [notification userInfo];</span><br><span class="line"><span class="built_in">CGFloat</span> height = [info[<span class="built_in">UIKeyboardFrameEndUserInfoKey</span>] <span class="built_in">CGRectValue</span>].size.height;</span><br></pre></td></tr></table></figure>
+<p>This height will not change when using a physical keyboard. The changed thing is the keyboard’s y position. Bingo!</p>
+<p>So, after I got the real height, I can move the bottom bar up.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)keyboardWillOpen:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// get delta y between bottom bar and keyboard</span></span><br><span class="line">    <span class="built_in">CGFloat</span> deltaY = bottomBarView.frame.origin.y + bottomBarView.frame.size.height - yPosition;</span><br><span class="line">    <span class="comment">// get keyboard showing animation time</span></span><br><span class="line">    <span class="keyword">double</span> animationDuration;</span><br><span class="line">    animationDuration = [[[notification userInfo] objectForKey:<span class="built_in">UIKeyboardAnimationDurationUserInfoKey</span>] doubleValue];</span><br><span class="line">    <span class="comment">// move up the bottom bar</span></span><br><span class="line">    <span class="keyword">if</span> (deltaY &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        [<span class="built_in">UIView</span> animateWithDuration:animationDuration delay:<span class="number">0.0</span> options:<span class="built_in">UIViewAnimationOptionCurveEaseInOut</span> animations:^&#123;</span><br><span class="line">            bottomBarView.center = <span class="built_in">CGPointMake</span>(bottomBarView.center.x, bottomBarView.center.y - deltaY);</span><br><span class="line">        &#125; completion:<span class="literal">nil</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And for moving the textfield or textView, I chose to put them inside a scroll view. Then, by changing the contentInsets and contentOffset, I can move up the them.  Something like this:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIEdgeInsets</span> contentInsets = <span class="built_in">UIEdgeInsetsMake</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, height, <span class="number">0.0</span>);</span><br><span class="line"><span class="keyword">self</span>.page_1.contentInset = contentInsets;</span><br><span class="line"><span class="keyword">self</span>.page_1.scrollIndicatorInsets = contentInsets;</span><br><span class="line"><span class="comment">// note: page_1 is an UIScrollView</span></span><br></pre></td></tr></table></figure>
+<p>I used <a href="https://github.com/ruslanskorb/RSKImageCropper" target="_blank" rel="noopener">RSKImageCropper</a> for my image cropping currently. Great library. Thanks a lot. I may change it later, because I want to add some image effects for users to modify their head image.</p>
+<p>For the last done circle, I used CABasicAnimation to draw it.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// create a circle layer</span></span><br><span class="line"><span class="built_in">CAShapeLayer</span> *circle = [<span class="built_in">CAShapeLayer</span> layer];</span><br><span class="line">circle.path = [<span class="built_in">UIBezierPath</span> bezierPathWithRoundedRect:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2.0</span>*radius, <span class="number">2.0</span>*radius) cornerRadius:radius].CGPath;</span><br><span class="line">circle.position = <span class="built_in">CGPointMake</span>(<span class="built_in">CGRectGetMidX</span>(finishView.frame)-radius, <span class="built_in">CGRectGetMidY</span>(finishView.frame)-radius);</span><br><span class="line">circle.fillColor = [<span class="built_in">UIColor</span> clearColor].CGColor;</span><br><span class="line">circle.strokeColor = [<span class="built_in">UIColor</span> whiteColor].CGColor;</span><br><span class="line">circle.lineWidth = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">self</span>.finishView.layer addSublayer:circle];</span><br><span class="line"></span><br><span class="line"><span class="built_in">CABasicAnimation</span> *drawAnimation = [<span class="built_in">CABasicAnimation</span> animationWithKeyPath:<span class="string">@"strokeEnd"</span>];</span><br><span class="line">drawAnimation.duration = <span class="number">0.55</span>;</span><br><span class="line">drawAnimation.repeatCount = <span class="number">1.0</span>;</span><br><span class="line">drawAnimation.fromValue = [<span class="built_in">NSNumber</span> numberWithFloat:<span class="number">0.0</span>f];</span><br><span class="line">drawAnimation.toValue = [<span class="built_in">NSNumber</span> numberWithFloat:<span class="number">1.0</span>f];</span><br><span class="line">drawAnimation.timingFunction = [<span class="built_in">CAMediaTimingFunction</span> functionWithName:kCAMediaTimingFunctionEaseIn];</span><br><span class="line">drawAnimation.delegate = <span class="keyword">self</span>;</span><br><span class="line">[circle addAnimation:drawAnimation forKey:<span class="string">@"drawCircleAnimation"</span>];</span><br></pre></td></tr></table></figure>
+<p>I think that is it. Hope you find some problem to tell me. Happing learning.</p>
+
+            
+
+        </div>
+    </div>
+    <!-- projects grid -->
+    
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/user-signup-flow/index.html" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/user-signup-flow/index.html" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/user-signup-flow/index.html" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/user-signup-flow/index.html&amp;title=User Signup Flow" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+    </div>
+</article>
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Juncheng Han. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Juncheng Han</h4>
+        
+            <div id="about-card-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>iOS and NodeJS Dev</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Sunnyvale, CA
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('../assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="../assets/js/jquery.js"></script>
+<script src="../assets/js/jquery.fancybox.js"></script>
+<script src="../assets/js/thumbs.js"></script>
+<script src="../assets/js/tranquilpeak.js"></script>
+<!--SCRIPTS END-->
+
+
+
+    </body>
+</html>
