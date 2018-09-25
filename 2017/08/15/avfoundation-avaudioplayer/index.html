@@ -1,0 +1,645 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="JasonH&#39;s Blog">
+    <title>AVFoundation AVAudioPlayer - JasonH&#39;s Blog</title>
+    <meta name="author" content="Juncheng Han">
+    
+    
+        <link rel="icon" href="/assets/images/favicn.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.Things that AVAudioPlayer can’t do:\n\nPlay audio from a network stream\nAccess the raw audio sample\nRequire very low latency\n\nCreate AVAudioPlayerThe AVAudioPlayer can be created by NSData or NSURL.\n12345678910111213141516171819202122// Initializer for AVAudioPlayer- (nullable instancetype)initWithContentsOfURL:(NSURL *)url error:(NSError **)outError;- (nullable instancetype)initWithData:(NSData *)data error:(NSError **)outError;// Example: // A function to create an AVAudioPlayer with local audio file name and its extension- (AVAudioPlayer *)playerFileName:(NSString *)name withExtension:(NSString *)extension &#123;    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:name withExtension:extension];    NSError *err;    AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&amp;err];        // Configure the player    if (player) &#123;        player.numberOfLoops = -1; // infinite loop        player.enableRate = YES;        [player prepareToPlay];    &#125; else &#123;        NSLog(@\"%@\", [err localizedDescription]);    &#125;        return player;&#125;\nControlling PlaybackAVAudioPlayer provides ways for us to modify the player’s volume, panning, playback rate, number of looping and preform audio metering.Calling play() will play a sound asynchronously. It will implicitly call the prepareToPlay() if the audio player is not already prepared to play. We can call the prepareToPlay() method after we created a audio player to minimize the lag between calling the play() method. Calling stop() method will stop the playback and undo the setup from prepareToPlay().\n12345678910111213141516171819/* set the audio player’s stereo pan position, value from -1.0 to 1.0. A value of -1.0 is full left, 0.0 is center, 1.0 is full right. */@property float pan;/* set the audio player’s volume, value from 0.0 to 1.0. */@property float volume;/* set the audio player’s playback rate. Default value is 1.0, value 0.5 is half-speed playback, 2.0 is double-speed playback. To set playback rate, we need to enable rate adjustment. */@property float rate;/* default is NO */@property BOOL enableRate;/* set number of times a sound will return to the beginning to repeat playback. Default value is 0, play once, a value of 1 plays twice, a negative value will play infinitely */@property NSInteger numberOfLoops;- (BOOL)prepareToPlay;- (void)play;- (BOOL)playAtTime:(NSTimeInterval)time;- (void)pause;- (void)stop;\nAudio Level MeteringAVAudioPlayer doesn’t meter the audio-level by default. We can turn it on and get average sound decibel and peak decibel.\n1234567/* default is not enabled */@property(getter=isMeteringEnabled) BOOL meteringEnabled; /* Refreshes the average and peak power values for all channels of an audio player. For best results, call this function in CADisplayLink */- (void)updateMeters; - (float)peakPowerForChannel:(NSUInteger)channelNumber; - (float)averagePowerForChannel:(NSUInteger)channelNumber;\nConfigure AVAudioSessionIn order to make our app playback sound when we lock the screen or we turn our cellphones to silent mode, we need to choose the correct AVAudioSessionCategory to AVAudioSession.AVAudioSession is a global singleton instance. We can configure it after app launched. There are several categories. https://developer.apple.com/documentation/avfoundation/avaudiosession/audio_session_categories\n\n\n\nCategory\nAllows Mixing\nAudio Input\nAudio Output\nWhen Screen Lock\nWhen Silent\n\n\n\n\nAmbient\nyes\nno\nyes\noff\noff\n\n\nSolo Ambient\nno\nno\nyes\noff\noff\n\n\nPlayback\noptional\nno\nyes\non\non\n\n\nRecord\nno\nyes\nno\non\non\n\n\nPlay and Record\noptional\nyes\nyes\non\non\n\n\nMulti-Route\nno\nyes\nyes\non\non\n\n\n\n123456789101112// Configure AVAudioSessionAVAudioSession *session = [AVAudioSession sharedInstance];NSError *error;// use AVAudioSessionCategoryPlayback to make the app playback sound when screen locked and silent turned onif (![session setCategory:AVAudioSessionCategoryPlayback error:&amp;error]) &#123;    NSLog(@\"Category Error: %@\", [error localizedDescription]);&#125;    if (![session setActive:YES error:&amp;error]) &#123;    NSLog(@\"Activation Error: %@\", [error localizedDescription]);&#125;\nIn order to make the app play in the background, we also need change the info.plist file. Add following code to the file.\n1234&lt;key&gt;UIBackgroundModes&lt;/key&gt;&lt;array&gt;    &lt;string&gt;audio&lt;/string&gt;&lt;/array&gt;\nAdding this setting specifies that the application is now allowed to play audio in the background.\nHandle InterruptionWhen we got a call or alarm, our app will automatically pause the sound, but it will not play the sound after the interruption. We can listen the AVAudioSessionInterruptionNotification notification and code the behavior we want.\n123456789101112131415// add notification for audio player controller[[NSNotificationCenter defaultCenter] addObserver:self                                        selector:@selector(handleInterruption:)                                           name:AVAudioSessionInterruptionNotification                                         object:[AVAudioSession sharedInstance]];                                         - (void)handleInterruption:(NSNotification *)notification&#123;    AVAudioSessionInterruptionType type = [notification.userInfo[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];    if (type == AVAudioSessionInterruptionTypeBegan) &#123;        // do something when interruption began    &#125;else if (type == AVAudioSessionInterruptionTypeEnded) &#123;        // do something when interruption ended    &#125;&#125;\nHandle Route ChangeWhen we switch the audio output route, iOS will send a route change notification. Suppose we want to stop the playback when users unplug their headphone, we can check the notification’s userInfo dictionary for the route change reason and for a description of the previous audio route. If previous portType is AVAudioSessionPortHeadphones, we stop the playback.\n1234567891011121314151617// Note This is not calling from main thread[[NSNotificationCenter defaultCenter] addObserver:self                                        selector:@selector(handleRouteChange:)                                            name:AVAudioSessionRouteChangeNotification                                          object:[AVAudioSession sharedInstance]];- (void)handleRouteChange:(NSNotification *)notification &#123;        AVAudioSessionRouteChangeReason reason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue];    if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) &#123;        AVAudioSessionRouteDescription *preRoute = notification.userInfo[AVAudioSessionRouteChangePreviousRouteKey];        NSString *portType = [[preRoute.outputs firstObject] portType];        if ([portType isEqualToString:AVAudioSessionPortHeadphones]) &#123;            // stop the playback        &#125;    &#125;&#125;\nAVAudioPlayer Delegate1234// Called when audioplayer finished playing.- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag;// Called when an audio player encounters a decoding error during playback.- (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error;\nHere is the link for the test app: AVAudioPlayer Test AppScreenshot\n","dateCreated":"2017-08-15T14:03:50-07:00","dateModified":"2018-09-25T14:24:13-07:00","datePublished":"2017-08-15T14:03:50-07:00","description":"AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.","headline":"AVFoundation AVAudioPlayer","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/","keywords":"iOS, AVFoundation, Objc, AVAudioPlayer","thumbnailUrl":"Swift.png"}</script>
+    <meta name="description" content="AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Que">
+<meta name="keywords" content="iOS,AVFoundation,Objc,AVAudioPlayer">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="AVFoundation AVAudioPlayer">
+<meta property="og:url" content="https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/index.html">
+<meta property="og:site_name" content="JasonH&#39;s Blog">
+<meta property="og:description" content="AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Que">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://github.com/JasonHan1990/AVFoundation-Learning/blob/master/Screenshots/01-AudioPlayer/Simulator%20Screen%20Shot%20Aug%2015%2C%202017%2C%204.57.12%20PM.png">
+<meta property="og:updated_time" content="2018-09-25T21:24:13.834Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AVFoundation AVAudioPlayer">
+<meta name="twitter:description" content="AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Que">
+<meta name="twitter:image" content="https://github.com/JasonHan1990/AVFoundation-Learning/blob/master/Screenshots/01-AudioPlayer/Simulator%20Screen%20Shot%20Aug%2015%2C%202017%2C%204.57.12%20PM.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.ioSwift.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioSwift.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="../../../../assets/css/all.css">
+    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-126130510-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="../../../../ ">JasonH&#39;s Blog</a>
+    </div>
+    
+        
+            <a  class="header-right-icon "
+                href="#about">
+        
+        
+            <i class="avatar.jpg fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="../../../../#about">
+                    <img class="sidebar-profile-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Juncheng Han</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../projects"
+                            
+                            title="Projects"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-th" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Projects</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail">
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé">
+                    
+                        <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Résumé</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            AVFoundation AVAudioPlayer
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-08-15T14:03:50-07:00">
+	
+		    Aug 15, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="../../../../categories/iOS/">iOS</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p><code>AVAudioPlayer</code> makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.<br><a id="more"></a><br>Things that <code>AVAudioPlayer</code> can’t do:</p>
+<ol>
+<li>Play audio from a network stream</li>
+<li>Access the raw audio sample</li>
+<li>Require very low latency</li>
+</ol>
+<h4 id="Create-AVAudioPlayer"><a href="#Create-AVAudioPlayer" class="headerlink" title="Create AVAudioPlayer"></a>Create AVAudioPlayer</h4><p>The <code>AVAudioPlayer</code> can be created by <code>NSData</code> or <code>NSURL</code>.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Initializer for AVAudioPlayer</span></span><br><span class="line">- (<span class="keyword">nullable</span> <span class="keyword">instancetype</span>)initWithContentsOfURL:(<span class="built_in">NSURL</span> *)url error:(<span class="built_in">NSError</span> **)outError;</span><br><span class="line">- (<span class="keyword">nullable</span> <span class="keyword">instancetype</span>)initWithData:(<span class="built_in">NSData</span> *)data error:(<span class="built_in">NSError</span> **)outError;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Example: </span></span><br><span class="line"><span class="comment">// A function to create an AVAudioPlayer with local audio file name and its extension</span></span><br><span class="line">- (<span class="built_in">AVAudioPlayer</span> *)playerFileName:(<span class="built_in">NSString</span> *)name withExtension:(<span class="built_in">NSString</span> *)extension &#123;</span><br><span class="line">    <span class="built_in">NSURL</span> *fileURL = [[<span class="built_in">NSBundle</span> mainBundle] URLForResource:name withExtension:extension];</span><br><span class="line">    <span class="built_in">NSError</span> *err;</span><br><span class="line">    <span class="built_in">AVAudioPlayer</span> *player = [[<span class="built_in">AVAudioPlayer</span> alloc] initWithContentsOfURL:fileURL error:&amp;err];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Configure the player</span></span><br><span class="line">    <span class="keyword">if</span> (player) &#123;</span><br><span class="line">        player.numberOfLoops = <span class="number">-1</span>; <span class="comment">// infinite loop</span></span><br><span class="line">        player.enableRate = <span class="literal">YES</span>;</span><br><span class="line">        [player prepareToPlay];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, [err localizedDescription]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> player;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Controlling-Playback"><a href="#Controlling-Playback" class="headerlink" title="Controlling Playback"></a>Controlling Playback</h4><p><code>AVAudioPlayer</code> provides ways for us to modify the player’s volume, panning, playback rate, number of looping and preform audio metering.<br>Calling <code>play()</code> will play a sound asynchronously. It will implicitly call the <code>prepareToPlay()</code> if the audio player is not already prepared to play. We can call the <code>prepareToPlay()</code> method after we created a audio player to minimize the lag between calling the <code>play()</code> method. Calling <code>stop()</code> method will stop the playback and undo the setup from <code>prepareToPlay()</code>.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* set the audio player’s stereo pan position, value from -1.0 to 1.0. A value of -1.0 is full left, 0.0 is center, 1.0 is full right. */</span></span><br><span class="line"><span class="keyword">@property</span> <span class="keyword">float</span> pan;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* set the audio player’s volume, value from 0.0 to 1.0. */</span></span><br><span class="line"><span class="keyword">@property</span> <span class="keyword">float</span> volume;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* set the audio player’s playback rate. Default value is 1.0, value 0.5 is half-speed playback, 2.0 is double-speed playback. To set playback rate, we need to enable rate adjustment. */</span></span><br><span class="line"><span class="keyword">@property</span> <span class="keyword">float</span> rate;</span><br><span class="line"><span class="comment">/* default is NO */</span></span><br><span class="line"><span class="keyword">@property</span> <span class="built_in">BOOL</span> enableRate;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* set number of times a sound will return to the beginning to repeat playback. Default value is 0, play once, a value of 1 plays twice, a negative value will play infinitely */</span></span><br><span class="line"><span class="keyword">@property</span> <span class="built_in">NSInteger</span> numberOfLoops;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">BOOL</span>)prepareToPlay;</span><br><span class="line">- (<span class="keyword">void</span>)play;</span><br><span class="line">- (<span class="built_in">BOOL</span>)playAtTime:(<span class="built_in">NSTimeInterval</span>)time;</span><br><span class="line">- (<span class="keyword">void</span>)pause;</span><br><span class="line">- (<span class="keyword">void</span>)stop;</span><br></pre></td></tr></table></figure>
+<h4 id="Audio-Level-Metering"><a href="#Audio-Level-Metering" class="headerlink" title="Audio Level Metering"></a>Audio Level Metering</h4><p><code>AVAudioPlayer</code> doesn’t meter the audio-level by default. We can turn it on and get average sound decibel and peak decibel.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* default is not enabled */</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">getter</span>=isMeteringEnabled) <span class="built_in">BOOL</span> meteringEnabled; </span><br><span class="line"></span><br><span class="line"><span class="comment">/* Refreshes the average and peak power values for all channels of an audio player. For best results, call this function in CADisplayLink */</span></span><br><span class="line">- (<span class="keyword">void</span>)updateMeters; </span><br><span class="line">- (<span class="keyword">float</span>)peakPowerForChannel:(<span class="built_in">NSUInteger</span>)channelNumber; </span><br><span class="line">- (<span class="keyword">float</span>)averagePowerForChannel:(<span class="built_in">NSUInteger</span>)channelNumber;</span><br></pre></td></tr></table></figure>
+<h4 id="Configure-AVAudioSession"><a href="#Configure-AVAudioSession" class="headerlink" title="Configure AVAudioSession"></a>Configure AVAudioSession</h4><p>In order to make our app playback sound when we lock the screen or we turn our cellphones to silent mode, we need to choose the correct <code>AVAudioSessionCategory</code> to <code>AVAudioSession</code>.<br><code>AVAudioSession</code> is a global singleton instance. We can configure it after app launched. There are several categories. <a href="https://developer.apple.com/documentation/avfoundation/avaudiosession/audio_session_categories" target="_blank" rel="noopener">https://developer.apple.com/documentation/avfoundation/avaudiosession/audio_session_categories</a></p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Allows Mixing</th>
+<th>Audio Input</th>
+<th>Audio Output</th>
+<th>When Screen Lock</th>
+<th>When Silent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ambient</td>
+<td>yes</td>
+<td>no</td>
+<td>yes</td>
+<td>off</td>
+<td>off</td>
+</tr>
+<tr>
+<td>Solo Ambient</td>
+<td>no</td>
+<td>no</td>
+<td>yes</td>
+<td>off</td>
+<td>off</td>
+</tr>
+<tr>
+<td>Playback</td>
+<td>optional</td>
+<td>no</td>
+<td>yes</td>
+<td>on</td>
+<td>on</td>
+</tr>
+<tr>
+<td>Record</td>
+<td>no</td>
+<td>yes</td>
+<td>no</td>
+<td>on</td>
+<td>on</td>
+</tr>
+<tr>
+<td>Play and Record</td>
+<td>optional</td>
+<td>yes</td>
+<td>yes</td>
+<td>on</td>
+<td>on</td>
+</tr>
+<tr>
+<td>Multi-Route</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>on</td>
+<td>on</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Configure AVAudioSession</span></span><br><span class="line"><span class="built_in">AVAudioSession</span> *session = [<span class="built_in">AVAudioSession</span> sharedInstance];</span><br><span class="line"></span><br><span class="line"><span class="built_in">NSError</span> *error;</span><br><span class="line"><span class="comment">// use AVAudioSessionCategoryPlayback to make the app playback sound when screen locked and silent turned on</span></span><br><span class="line"><span class="keyword">if</span> (![session setCategory:<span class="built_in">AVAudioSessionCategoryPlayback</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Category Error: %@"</span>, [error localizedDescription]);</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> (![session setActive:<span class="literal">YES</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Activation Error: %@"</span>, [error localizedDescription]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>In order to make the app play in the background, we also need change the info.plist file. Add following code to the file.</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">key</span>&gt;</span>UIBackgroundModes<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>audio<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Adding this setting specifies that the application is now allowed to play audio in the background.</p>
+<h4 id="Handle-Interruption"><a href="#Handle-Interruption" class="headerlink" title="Handle Interruption"></a>Handle Interruption</h4><p>When we got a call or alarm, our app will automatically pause the sound, but it will not play the sound after the interruption. We can listen the <code>AVAudioSessionInterruptionNotification</code> notification and code the behavior we want.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// add notification for audio player controller</span></span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                        selector:<span class="keyword">@selector</span>(handleInterruption:)</span><br><span class="line">                                           name:<span class="built_in">AVAudioSessionInterruptionNotification</span></span><br><span class="line">                                         object:[<span class="built_in">AVAudioSession</span> sharedInstance]];</span><br><span class="line">                                         </span><br><span class="line">- (<span class="keyword">void</span>)handleInterruption:(<span class="built_in">NSNotification</span> *)notification</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">AVAudioSessionInterruptionType</span> type = [notification.userInfo[<span class="built_in">AVAudioSessionInterruptionTypeKey</span>] unsignedIntegerValue];</span><br><span class="line">    <span class="keyword">if</span> (type == <span class="built_in">AVAudioSessionInterruptionTypeBegan</span>) &#123;</span><br><span class="line">        <span class="comment">// do something when interruption began</span></span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span> (type == <span class="built_in">AVAudioSessionInterruptionTypeEnded</span>) &#123;</span><br><span class="line">        <span class="comment">// do something when interruption ended</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Handle-Route-Change"><a href="#Handle-Route-Change" class="headerlink" title="Handle Route Change"></a>Handle Route Change</h4><p>When we switch the audio output route, iOS will send a route change notification. Suppose we want to stop the playback when users unplug their headphone, we can check the notification’s userInfo dictionary for the route change reason and for a description of the previous audio route. If previous portType is <code>AVAudioSessionPortHeadphones</code>, we stop the playback.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Note This is not calling from main thread</span></span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                        selector:<span class="keyword">@selector</span>(handleRouteChange:)</span><br><span class="line">                                            name:<span class="built_in">AVAudioSessionRouteChangeNotification</span></span><br><span class="line">                                          object:[<span class="built_in">AVAudioSession</span> sharedInstance]];</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)handleRouteChange:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">AVAudioSessionRouteChangeReason</span> reason = [notification.userInfo[<span class="built_in">AVAudioSessionRouteChangeReasonKey</span>] unsignedIntegerValue];</span><br><span class="line">    <span class="keyword">if</span> (reason == <span class="built_in">AVAudioSessionRouteChangeReasonOldDeviceUnavailable</span>) &#123;</span><br><span class="line">        <span class="built_in">AVAudioSessionRouteDescription</span> *preRoute = notification.userInfo[<span class="built_in">AVAudioSessionRouteChangePreviousRouteKey</span>];</span><br><span class="line">        <span class="built_in">NSString</span> *portType = [[preRoute.outputs firstObject] portType];</span><br><span class="line">        <span class="keyword">if</span> ([portType isEqualToString:<span class="built_in">AVAudioSessionPortHeadphones</span>]) &#123;</span><br><span class="line">            <span class="comment">// stop the playback</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="AVAudioPlayer-Delegate"><a href="#AVAudioPlayer-Delegate" class="headerlink" title="AVAudioPlayer Delegate"></a>AVAudioPlayer Delegate</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Called when audioplayer finished playing.</span></span><br><span class="line">- (<span class="keyword">void</span>)audioPlayerDidFinishPlaying:(<span class="built_in">AVAudioPlayer</span> *)player successfully:(<span class="built_in">BOOL</span>)flag;</span><br><span class="line"><span class="comment">// Called when an audio player encounters a decoding error during playback.</span></span><br><span class="line">- (<span class="keyword">void</span>)audioPlayerDecodeErrorDidOccur:(<span class="built_in">AVAudioPlayer</span> *)player error:(<span class="built_in">NSError</span> *)error;</span><br></pre></td></tr></table></figure>
+<p>Here is the link for the test app: <a href="https://github.com/JasonHan1990/AVFoundation-Learning/tree/master/01-AudioPlayer" target="_blank" rel="noopener">AVAudioPlayer Test App</a><br><div class="figure center" style="width:;"><a class="fancybox" href="https://github.com/JasonHan1990/AVFoundation-Learning/blob/master/Screenshots/01-AudioPlayer/Simulator%20Screen%20Shot%20Aug%2015%2C%202017%2C%204.57.12%20PM.png" title="Screenshot" data-caption="Screenshot" data-fancybox="default" target="_blank" rel="noopener"><img class="fig-img" src="https://github.com/JasonHan1990/AVFoundation-Learning/blob/master/Screenshots/01-AudioPlayer/Simulator%20Screen%20Shot%20Aug%2015%2C%202017%2C%204.57.12%20PM.png" alt="Screenshot"></a><span class="caption">Screenshot</span></div></p>
+
+            
+
+        </div>
+    </div>
+    <!-- projects grid -->
+    
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVAudioPlayer/">AVAudioPlayer</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVFoundation/">AVFoundation</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2018/09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="PREVIOUS: Blog moving notice">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../07/swift-refreshing/" data-tooltip="Swift Refreshing" aria-label="NEXT: Swift Refreshing">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/&amp;title=AVFoundation AVAudioPlayer" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Juncheng Han. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2018/09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="PREVIOUS: Blog moving notice">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../07/swift-refreshing/" data-tooltip="Swift Refreshing" aria-label="NEXT: Swift Refreshing">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/&amp;title=AVFoundation AVAudioPlayer" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/">
+                    <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/&amp;title=AVFoundation AVAudioPlayer">
+                    <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Juncheng Han</h4>
+        
+            <div id="about-card-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>iOS and NodeJS Dev</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Sunnyvale, CA
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="../../../../assets/js/jquery.js"></script>
+<script src="../../../../assets/js/jquery.fancybox.js"></script>
+<script src="../../../../assets/js/thumbs.js"></script>
+<script src="../../../../assets/js/tranquilpeak.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+    </body>
+</html>
