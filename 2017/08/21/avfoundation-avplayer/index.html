@@ -1,0 +1,638 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="JasonH&#39;s Blog">
+    <title>AVPlayer - AVFoundation - JasonH&#39;s Blog</title>
+    <meta name="author" content="Juncheng Han">
+    
+    
+        <link rel="icon" href="/assets/images/favicn.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"AVPlayerAVFoundation provides a controller class AVPlayer to play timed audio-visual media. The AVPlayer can handle playback of local, progressively downloaded and streamed media conforming HLS protocol. \n\nAVPlayer is just a controller. It can play, pause, stop and jump to a certain time in a video, but it can’t show a video to users’ eyes. In order to display the video in user interface, we need use AVPlayerLayer.\nAVPlayerLayerAVPlayerLayer is built on the top of Core Animation. AVPlayerLayer extends the CALayer class, so it can be used like any other CALayer and can be set as the backing layer for UIView or NSView or can be added into an existing layer hierarchy.AVPlayerLayer has a property videoGravity to specifies how the video is displayed within a player layer’s bounds.\n1234567891011121314151617181920typedef NSString * AVLayerVideoGravity NS_STRING_ENUM;/*!    @constant       AVLayerVideoGravityResizeAspect    @abstract       Preserve aspect ratio; fit within layer bounds. */AVF_EXPORT AVLayerVideoGravity const AVLayerVideoGravityResizeAspect NS_AVAILABLE(10_7, 4_0); // default/*!    @constant       AVLayerVideoGravityResizeAspectFill    @abstract       Preserve aspect ratio; fill layer bounds. */AVF_EXPORT AVLayerVideoGravity const AVLayerVideoGravityResizeAspectFill NS_AVAILABLE(10_7, 4_0);/*!    @constant       AVLayerVideoGravityResize    @abstract       Stretch to fill layer bounds. */AVF_EXPORT AVLayerVideoGravity const AVLayerVideoGravityResize NS_AVAILABLE(10_7, 4_0);\nAVPlayerItemAVPlayerItem stores the reference to AVAsset objects. AVPlayerItem is a dynamic object. Many of its property values can be changed during the item’s preparation and playback. We can use KVO to observe these changes as they occur. For instance, the AVPlayerItem has a property status to indicate if the item is ready for playback. When you first create a player item, the status is AVPlayerItemStatusUnknown, meaning it’s not ready for playback. We need to wait until its status changes to AVPlayerItemStatusReadyToPlay before it’s ready to use.\nCreating AVPlayer1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162// Example for create an avplayer@property (strong, nonatomic) AVPlayer * player;@property (strong, nonatomic) AVPlayerItem * playerItem;- (void)initPlayer:(NSURL *)url &#123;    // Create AVAsset  AVAsset *asset = [AVAsset assetWithURL:url];    // Create an avplayer item with asset  playerItem = [AVPlayerItem playerItemWithAsset:asset];    // register KVO for observing the change of status  NSKeyValueObservingOptions options =        NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew;    [playItem addObserver:self              forKeyPath:@\"status\"                 options:options                 context:&amp;PlayerItemContext];    // create avplayer with player item  self.player = [AVPlayer playerWithPlayerItem:playerItem];    // create a player layer to display video content  AVPlayerLayer *playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];    // add player layer to current view hierarchy  [self.view.layer addSublayer:playerLayer];&#125;- (void)observeValueForKeyPath:(NSString *)keyPath                      ofObject:(id)object                        change:(NSDictionary&lt;NSString *,id&gt; *)change                       context:(void *)context &#123;    // Only handle observations for the PlayerItemContext    if (context != &amp;PlayerItemContext) &#123;        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];        return;    &#125;     if ([keyPath isEqualToString:@\"status\"]) &#123;        AVPlayerItemStatus status = AVPlayerItemStatusUnknown;        // Get the status change from the change dictionary        NSNumber *statusNumber = change[NSKeyValueChangeNewKey];        if ([statusNumber isKindOfClass:[NSNumber class]]) &#123;            status = statusNumber.integerValue;        &#125;        // Switch over the status        switch (status) &#123;            case AVPlayerItemStatusReadyToPlay:                // Ready to Play                break;            case AVPlayerItemStatusFailed:                // Failed. Examine AVPlayerItem.error                break;            case AVPlayerItemStatusUnknown:                // Not ready                break;        &#125;    &#125;&#125;\nManage Playback TimeCMTime is the structure describing media time. A CMTime is represented as a rational number, with a numerator (an int64_t value), and a denominator (an int32_t timescale).\n123456typedef struct&#123;        CMTimeValue    value; // think as the total number of frames    CMTimeScale    timescale; // think as the frame per second    CMTimeFlags    flags;          CMTimeEpoch    epoch;&#125; CMTime;\nAVPlayerItem has a duration property which is a object of CMTime. We can get the total duration in seconds by \n1234double seconds = playerItem.duration.value / playerItem.duration.timescale;// ordouble seconds = CMTimeGetSeconds(playerItem.duration)\nWe can create a CMTime by CMTimeMake(int64_t value, int32_t timescale)\n12CMTime t1 = CMTimeMake(1, 10); // 0.1sCMTime t2 = CMTimeMake(2, 1); // 2s\nAVPlayer has this functions to manage the time.\n1234567891011121314151617181920212223/* Returns the current time of the current player item. */- (CMTime)currentTime;/* Sets the current playback time to the time specified by the date object. */- (void)seekToDate:(NSDate *)date;/* Sets the current playback time to the specified time and executes the specified block when the seek operation completes or is interrupted. */- (void)seekToDate:(NSDate *)date completionHandler:(void (^)(BOOL finished))completionHandler NS_AVAILABLE(10_7, 5_0);/* Sets the current playback time to the specified time. */- (void)seekToTime:(CMTime)time;/* Sets the current playback time within a specified time bound. */- (void)seekToTime:(CMTime)time toleranceBefore:(CMTime)toleranceBefore toleranceAfter:(CMTime)toleranceAfter;/* Sets the current playback time to the specified time and executes the specified block when the seek operation completes or is interrupted. */- (void)seekToTime:(CMTime)time completionHandler:(void (^)(BOOL finished))completionHandler NS_AVAILABLE(10_7, 5_0);/* Sets the current playback time within a specified time bound and invokes the specified block when the seek operation has either been completed or been interrupted. */- (void)seekToTime:(CMTime)time toleranceBefore:(CMTime)toleranceBefore toleranceAfter:(CMTime)toleranceAfter completionHandler:(void (^)(BOOL finished))completionHandler NS_AVAILABLE(10_7, 5_0);\nObserving timeAVPlayer also provides methods for us to observing time.\n12345678/* Requests the periodic invocation of a given block during playback to report changing time. */- (id)addPeriodicTimeObserverForInterval:(CMTime)interval queue:(nullable dispatch_queue_t)queue usingBlock:(void (^)(CMTime time))block;/* Requests the invocation of a block when specified times are traversed during normal playback. */- (id)addBoundaryTimeObserverForTimes:(NSArray&lt;NSValue *&gt; *)times queue:(nullable dispatch_queue_t)queue usingBlock:(void (^)(void))block;/* Cancels a previously registered periodic or boundary time observer. */- (void)removeTimeObserver:(id)observer;\nFor example, we can add update the player transport UI by adding a periodic time observer.\n12345678910111213141516171819202122// update transport UI- (void)addPeriodicTimeObserver &#123;    // Invoke callback every half second    CMTime interval = CMTimeMakeWithSeconds(0.5, NSEC_PER_SEC);    // Queue on which to invoke the callback    dispatch_queue_t mainQueue = dispatch_get_main_queue();    // Add time observer    __weak typeof(self)WeakSelf = self;    self.timeObserverToken =        [self.player addPeriodicTimeObserverForInterval:interval                                                  queue:mainQueue                                             usingBlock:^(CMTime time) &#123;                                                 // Use weak reference to self                                                 // Update player transport UI                                                 float currentPlayTime = (float)item.currentTime.value/ item.currentTime.timescale;                                                 [WeakSelf updateTransportBar:currentPlayTime];                                             &#125;];&#125;- (void)dealloc &#123;  [_player removeTimeObserver:_timeObserverToken];&#125;\nHandle Playback EndAVPlayerItem has several notifications for different activities.\n\nAVPlayerItemTimeJumpedNotification\nAVPlayerItemDidPlayToEndTimeNotification\nAVPlayerItemFailedToPlayToEndTimeNotification\nAVPlayerItemPlaybackStalledNotification\nAVPlayerItemNewAccessLogEntryNotification\nAVPlayerItemNewErrorLogEntryNotification\n\nWe can use these to track current playback. For handling playback end:\n1234567891011121314// Add Observer[[NSNotificationCenter defaultCenter] addObserver:self                                         selector:@selector(handlePlayerDidFinishPlaying:)                                             name:AVPlayerItemDidPlayToEndTimeNotification                                           object:[self.player currentItem]];                                           - (void)handlePlayerDidFinishPlaying:(NSNotification *)notification &#123;    AVPlayerItem *playerItem = (AVPlayerItem *)notification.object;        // Jump to the beginning of the video    [playerItem seekToTime:kCMTimeZero];    // pause the video    [player pause];&#125;\nHandle InterruptionWhen AVPlayer got interrupted, current playback will pause. We can listen to the notification comes from AVAudioSession, but don’t forget to activate AVAudioSession.\n12345678910111213141516171819202122232425262728293031// Configure AVAudioSession and activate it when you init your avplayer controller// Setup audio session catagory, use playback for video playbackAVAudioSession *session = [AVAudioSession sharedInstance];        NSError *error;if (![session setCategory:AVAudioSessionCategoryPlayback error:&amp;error]) &#123;    NSLog(@\"Category Error: %@\", [error localizedDescription]);&#125;        if (![session setActive:YES error:&amp;error]) &#123;    NSLog(@\"Activation Error: %@\", [error localizedDescription]);&#125;// Add Observer[[NSNotificationCenter defaultCenter] addObserver:self                                         selector:@selector(handleSessionInterruption:)                                             name:AVAudioSessionInterruptionNotification                                           object:nil];                                           - (void)handleSessionInterruption:(NSNotification *)notification &#123;    AVAudioSessionInterruptionType type = [notification.userInfo[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];    if (type == AVAudioSessionInterruptionTypeBegan) &#123;            // pause the video        [self.player pause];            &#125; else if (type == AVAudioSessionInterruptionTypeEnded) &#123;        // resume the video ??    &#125;&#125;\nHandle Route ChangeWe will use the notification comes from AVAudioSession again to handle route change.\n12345678910111213141516171819202122// Add Observer[[NSNotificationCenter defaultCenter] addObserver:self                                         selector:@selector(handleRouteChange:)                                             name:AVAudioSessionRouteChangeNotification                                           object:nil];                                           - (void)handleRouteChange:(NSNotification *)notification &#123;        AVAudioSessionRouteChangeReason reason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue];        if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) &#123;        AVAudioSessionRouteDescription *preRoute = notification.userInfo[AVAudioSessionRouteChangePreviousRouteKey];        NSString *portType = [[preRoute.outputs firstObject] portType];        if ([portType isEqualToString:AVAudioSessionPortHeadphones]) &#123;            // This notification was send from other thread, pop up error message under main thread            dispatch_async(dispatch_get_main_queue(), ^&#123;                // pause the video                [self pause];            &#125;);        &#125;    &#125;&#125;\nHandle Fail Play To EndAVPlayerItemFailedToPlayToEndTimeNotification. In most cases, we will get this notification when we play streaming video and you got network problem.\n1234567891011121314// Add Observer[[NSNotificationCenter defaultCenter] addObserver:self                                         selector:@selector(handleAVPlayerItemFailedToPlayToEndTime:)                                              name:AVPlayerItemFailedToPlayToEndTimeNotification                                           object:nil];                                           - (void)handleAVPlayerItemFailedToPlayToEndTime:(NSNotification *)notification &#123;    NSError *error = notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey];        // This notification was send from other thread, pop up error message under main thread    dispatch_async(dispatch_get_main_queue(), ^&#123;        [self popErrorAlert:error];    &#125;);&#125;\nHere is the Test App\n","dateCreated":"2017-08-21T19:37:17-07:00","dateModified":"2018-09-26T19:43:26-07:00","datePublished":"2017-08-21T19:37:17-07:00","description":"AVPlayerAVFoundation provides a controller class AVPlayer to play timed audio-visual media. The AVPlayer can handle playback of local, progressively downloaded and streamed media conforming HLS protocol. ","headline":"AVPlayer - AVFoundation","image":["AVFoundation.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/","keywords":"iOS, AVFoundation, Objc, AVPlayer","thumbnailUrl":"AVFoundation.png"}</script>
+    <meta name="description" content="AVPlayerAVFoundation provides a controller class AVPlayer to play timed audio-visual media. The AVPlayer can handle playback of local, progressively downloaded and streamed media conforming HLS protoc">
+<meta name="keywords" content="iOS,AVFoundation,Objc,AVPlayer">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="AVPlayer - AVFoundation">
+<meta property="og:url" content="https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/index.html">
+<meta property="og:site_name" content="JasonH&#39;s Blog">
+<meta property="og:description" content="AVPlayerAVFoundation provides a controller class AVPlayer to play timed audio-visual media. The AVPlayer can handle playback of local, progressively downloaded and streamed media conforming HLS protoc">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-09-27T02:43:26.217Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AVPlayer - AVFoundation">
+<meta name="twitter:description" content="AVPlayerAVFoundation provides a controller class AVPlayer to play timed audio-visual media. The AVPlayer can handle playback of local, progressively downloaded and streamed media conforming HLS protoc">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.ioAVFoundation.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioAVFoundation.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="../../../../assets/css/all.css">
+    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-126130510-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="../../../../ ">JasonH&#39;s Blog</a>
+    </div>
+    
+        
+            <a  class="header-right-icon "
+                href="#about">
+        
+        
+            <i class="avatar.jpg fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="../../../../#about">
+                    <img class="sidebar-profile-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Juncheng Han</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../ "
+                            
+                            title="Home"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../projects"
+                            
+                            title="Projects"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-th" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Projects</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-categories"
+                            
+                            title="Categories"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-tags"
+                            
+                            title="Tags"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-archives"
+                            
+                            title="Archives"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail">
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé">
+                    
+                        <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Résumé</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a  class="sidebar-button-link "
+                             href="../../../../atom.xml"
+                            
+                            title="RSS"
+                        >
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            AVPlayer - AVFoundation
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2017-08-21T19:37:17-07:00">
+	
+		    Aug 21, 2017
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="../../../../categories/iOS/">iOS</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h4 id="AVPlayer"><a href="#AVPlayer" class="headerlink" title="AVPlayer"></a>AVPlayer</h4><p>AVFoundation provides a controller class <code>AVPlayer</code> to play timed audio-visual media. The AVPlayer can handle playback of local, progressively downloaded and streamed media conforming HLS protocol. </p>
+<a id="more"></a>
+<p>AVPlayer is just a controller. It can play, pause, stop and jump to a certain time in a video, but it can’t show a video to users’ eyes. In order to display the video in user interface, we need use <code>AVPlayerLayer</code>.</p>
+<h4 id="AVPlayerLayer"><a href="#AVPlayerLayer" class="headerlink" title="AVPlayerLayer"></a>AVPlayerLayer</h4><p><code>AVPlayerLayer</code> is built on the top of Core Animation. <code>AVPlayerLayer</code> extends the <code>CALayer</code> class, so it can be used like any other CALayer and can be set as the backing layer for <code>UIView</code> or <code>NSView</code> or can be added into an existing layer hierarchy.<br><code>AVPlayerLayer</code> has a property <code>videoGravity</code> to specifies how the video is displayed within a player layer’s bounds.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NSString</span> * <span class="built_in">AVLayerVideoGravity</span> <span class="built_in">NS_STRING_ENUM</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    @constant       AVLayerVideoGravityResizeAspect</span></span><br><span class="line"><span class="comment">    @abstract       Preserve aspect ratio; fit within layer bounds.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">AVF_EXPORT</span> <span class="built_in">AVLayerVideoGravity</span> <span class="keyword">const</span> <span class="built_in">AVLayerVideoGravityResizeAspect</span> <span class="built_in">NS_AVAILABLE</span>(<span class="number">10</span>_7, <span class="number">4</span>_0); <span class="comment">// default</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    @constant       AVLayerVideoGravityResizeAspectFill</span></span><br><span class="line"><span class="comment">    @abstract       Preserve aspect ratio; fill layer bounds.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">AVF_EXPORT</span> <span class="built_in">AVLayerVideoGravity</span> <span class="keyword">const</span> <span class="built_in">AVLayerVideoGravityResizeAspectFill</span> <span class="built_in">NS_AVAILABLE</span>(<span class="number">10</span>_7, <span class="number">4</span>_0);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*!</span></span><br><span class="line"><span class="comment">    @constant       AVLayerVideoGravityResize</span></span><br><span class="line"><span class="comment">    @abstract       Stretch to fill layer bounds.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">AVF_EXPORT</span> <span class="built_in">AVLayerVideoGravity</span> <span class="keyword">const</span> <span class="built_in">AVLayerVideoGravityResize</span> <span class="built_in">NS_AVAILABLE</span>(<span class="number">10</span>_7, <span class="number">4</span>_0);</span><br></pre></td></tr></table></figure>
+<h4 id="AVPlayerItem"><a href="#AVPlayerItem" class="headerlink" title="AVPlayerItem"></a>AVPlayerItem</h4><p><code>AVPlayerItem</code> stores the reference to <code>AVAsset</code> objects. <code>AVPlayerItem</code> is a dynamic object. Many of its property values can be changed during the item’s preparation and playback. We can use KVO to observe these changes as they occur. For instance, the <code>AVPlayerItem</code> has a property status to indicate if the item is ready for playback. When you first create a player item, the status is <code>AVPlayerItemStatusUnknown</code>, meaning it’s not ready for playback. We need to wait until its status changes to <code>AVPlayerItemStatusReadyToPlay</code> before it’s ready to use.</p>
+<h4 id="Creating-AVPlayer"><a href="#Creating-AVPlayer" class="headerlink" title="Creating AVPlayer"></a>Creating AVPlayer</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Example for create an avplayer</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>, <span class="keyword">nonatomic</span>) <span class="built_in">AVPlayer</span> * player;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">strong</span>, <span class="keyword">nonatomic</span>) <span class="built_in">AVPlayerItem</span> * playerItem;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)initPlayer:(<span class="built_in">NSURL</span> *)url &#123;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Create AVAsset</span></span><br><span class="line">  <span class="built_in">AVAsset</span> *asset = [<span class="built_in">AVAsset</span> assetWithURL:url];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Create an avplayer item with asset</span></span><br><span class="line">  playerItem = [<span class="built_in">AVPlayerItem</span> playerItemWithAsset:asset];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// register KVO for observing the change of status</span></span><br><span class="line">  <span class="built_in">NSKeyValueObservingOptions</span> options =</span><br><span class="line">        <span class="built_in">NSKeyValueObservingOptionOld</span> | <span class="built_in">NSKeyValueObservingOptionNew</span>;</span><br><span class="line">  </span><br><span class="line">  [playItem addObserver:<span class="keyword">self</span> </span><br><span class="line">             forKeyPath:<span class="string">@"status"</span> </span><br><span class="line">                options:options </span><br><span class="line">                context:&amp;PlayerItemContext];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// create avplayer with player item</span></span><br><span class="line">  <span class="keyword">self</span>.player = [<span class="built_in">AVPlayer</span> playerWithPlayerItem:playerItem];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// create a player layer to display video content</span></span><br><span class="line">  <span class="built_in">AVPlayerLayer</span> *playerLayer = [<span class="built_in">AVPlayerLayer</span> playerLayerWithPlayer:<span class="keyword">self</span>.player];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// add player layer to current view hierarchy</span></span><br><span class="line">  [<span class="keyword">self</span>.view.layer addSublayer:playerLayer];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)observeValueForKeyPath:(<span class="built_in">NSString</span> *)keyPath</span><br><span class="line">                      ofObject:(<span class="keyword">id</span>)object</span><br><span class="line">                        change:(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="keyword">id</span>&gt; *)change</span><br><span class="line">                       context:(<span class="keyword">void</span> *)context &#123;</span><br><span class="line">    <span class="comment">// Only handle observations for the PlayerItemContext</span></span><br><span class="line">    <span class="keyword">if</span> (context != &amp;PlayerItemContext) &#123;</span><br><span class="line">        [<span class="keyword">super</span> observeValueForKeyPath:keyPath ofObject:object change:change context:context];</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> ([keyPath isEqualToString:<span class="string">@"status"</span>]) &#123;</span><br><span class="line">        <span class="built_in">AVPlayerItemStatus</span> status = <span class="built_in">AVPlayerItemStatusUnknown</span>;</span><br><span class="line">        <span class="comment">// Get the status change from the change dictionary</span></span><br><span class="line">        <span class="built_in">NSNumber</span> *statusNumber = change[<span class="built_in">NSKeyValueChangeNewKey</span>];</span><br><span class="line">        <span class="keyword">if</span> ([statusNumber isKindOfClass:[<span class="built_in">NSNumber</span> <span class="keyword">class</span>]]) &#123;</span><br><span class="line">            status = statusNumber.integerValue;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Switch over the status</span></span><br><span class="line">        <span class="keyword">switch</span> (status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="built_in">AVPlayerItemStatusReadyToPlay</span>:</span><br><span class="line">                <span class="comment">// Ready to Play</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="built_in">AVPlayerItemStatusFailed</span>:</span><br><span class="line">                <span class="comment">// Failed. Examine AVPlayerItem.error</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="built_in">AVPlayerItemStatusUnknown</span>:</span><br><span class="line">                <span class="comment">// Not ready</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Manage-Playback-Time"><a href="#Manage-Playback-Time" class="headerlink" title="Manage Playback Time"></a>Manage Playback Time</h4><p><code>CMTime</code> is the structure describing media time. A CMTime is represented as a rational number, with a numerator (an int64_t value), and a denominator (an int32_t timescale).</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span>&#123;    </span><br><span class="line">    <span class="built_in">CMTimeValue</span>    value; <span class="comment">// think as the total number of frames</span></span><br><span class="line">    <span class="built_in">CMTimeScale</span>    timescale; <span class="comment">// think as the frame per second</span></span><br><span class="line">    <span class="built_in">CMTimeFlags</span>    flags;      </span><br><span class="line">    <span class="built_in">CMTimeEpoch</span>    epoch;</span><br><span class="line">&#125; <span class="built_in">CMTime</span>;</span><br></pre></td></tr></table></figure>
+<p><code>AVPlayerItem</code> has a duration property which is a object of CMTime. We can get the total duration in seconds by </p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> seconds = playerItem.duration.value / playerItem.duration.timescale;</span><br><span class="line"></span><br><span class="line"><span class="comment">// or</span></span><br><span class="line"><span class="keyword">double</span> seconds = <span class="built_in">CMTimeGetSeconds</span>(playerItem.duration)</span><br></pre></td></tr></table></figure>
+<p>We can create a CMTime by <code>CMTimeMake(int64_t value, int32_t timescale)</code></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CMTime</span> t1 = <span class="built_in">CMTimeMake</span>(<span class="number">1</span>, <span class="number">10</span>); <span class="comment">// 0.1s</span></span><br><span class="line"><span class="built_in">CMTime</span> t2 = <span class="built_in">CMTimeMake</span>(<span class="number">2</span>, <span class="number">1</span>); <span class="comment">// 2s</span></span><br></pre></td></tr></table></figure>
+<p><code>AVPlayer</code> has this functions to manage the time.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Returns the current time of the current player item. */</span></span><br><span class="line">- (<span class="built_in">CMTime</span>)currentTime;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Sets the current playback time to the time specified by the date object.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">void</span>)seekToDate:(<span class="built_in">NSDate</span> *)date;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Sets the current playback time to the specified time and executes the specified block when the seek operation completes or is interrupted. */</span></span><br><span class="line">- (<span class="keyword">void</span>)seekToDate:(<span class="built_in">NSDate</span> *)date completionHandler:(<span class="keyword">void</span> (^)(<span class="built_in">BOOL</span> finished))completionHandler <span class="built_in">NS_AVAILABLE</span>(<span class="number">10</span>_7, <span class="number">5</span>_0);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Sets the current playback time to the specified time. */</span></span><br><span class="line">- (<span class="keyword">void</span>)seekToTime:(<span class="built_in">CMTime</span>)time;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Sets the current playback time within a specified time bound. */</span></span><br><span class="line">- (<span class="keyword">void</span>)seekToTime:(<span class="built_in">CMTime</span>)time toleranceBefore:(<span class="built_in">CMTime</span>)toleranceBefore toleranceAfter:(<span class="built_in">CMTime</span>)toleranceAfter;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Sets the current playback time to the specified time and executes the specified block when the seek operation completes or is interrupted.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">void</span>)seekToTime:(<span class="built_in">CMTime</span>)time completionHandler:(<span class="keyword">void</span> (^)(<span class="built_in">BOOL</span> finished))completionHandler <span class="built_in">NS_AVAILABLE</span>(<span class="number">10</span>_7, <span class="number">5</span>_0);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Sets the current playback time within a specified time bound and invokes the specified block when the seek operation has either been completed or been interrupted.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">void</span>)seekToTime:(<span class="built_in">CMTime</span>)time toleranceBefore:(<span class="built_in">CMTime</span>)toleranceBefore toleranceAfter:(<span class="built_in">CMTime</span>)toleranceAfter completionHandler:(<span class="keyword">void</span> (^)(<span class="built_in">BOOL</span> finished))completionHandler <span class="built_in">NS_AVAILABLE</span>(<span class="number">10</span>_7, <span class="number">5</span>_0);</span><br></pre></td></tr></table></figure>
+<h4 id="Observing-time"><a href="#Observing-time" class="headerlink" title="Observing time"></a>Observing time</h4><p><code>AVPlayer</code> also provides methods for us to observing time.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Requests the periodic invocation of a given block during playback to report changing time. */</span></span><br><span class="line">- (<span class="keyword">id</span>)addPeriodicTimeObserverForInterval:(<span class="built_in">CMTime</span>)interval queue:(<span class="keyword">nullable</span> <span class="built_in">dispatch_queue_t</span>)queue usingBlock:(<span class="keyword">void</span> (^)(<span class="built_in">CMTime</span> time))block;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Requests the invocation of a block when specified times are traversed during normal playback. */</span></span><br><span class="line">- (<span class="keyword">id</span>)addBoundaryTimeObserverForTimes:(<span class="built_in">NSArray</span>&lt;<span class="built_in">NSValue</span> *&gt; *)times queue:(<span class="keyword">nullable</span> <span class="built_in">dispatch_queue_t</span>)queue usingBlock:(<span class="keyword">void</span> (^)(<span class="keyword">void</span>))block;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Cancels a previously registered periodic or boundary time observer. */</span></span><br><span class="line">- (<span class="keyword">void</span>)removeTimeObserver:(<span class="keyword">id</span>)observer;</span><br></pre></td></tr></table></figure>
+<p>For example, we can add update the player transport UI by adding a periodic time observer.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// update transport UI</span></span><br><span class="line">- (<span class="keyword">void</span>)addPeriodicTimeObserver &#123;</span><br><span class="line">    <span class="comment">// Invoke callback every half second</span></span><br><span class="line">    <span class="built_in">CMTime</span> interval = <span class="built_in">CMTimeMakeWithSeconds</span>(<span class="number">0.5</span>, <span class="built_in">NSEC_PER_SEC</span>);</span><br><span class="line">    <span class="comment">// Queue on which to invoke the callback</span></span><br><span class="line">    <span class="built_in">dispatch_queue_t</span> mainQueue = dispatch_get_main_queue();</span><br><span class="line">    <span class="comment">// Add time observer</span></span><br><span class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>)WeakSelf = <span class="keyword">self</span>;</span><br><span class="line">    <span class="keyword">self</span>.timeObserverToken =</span><br><span class="line">        [<span class="keyword">self</span>.player addPeriodicTimeObserverForInterval:interval</span><br><span class="line">                                                  queue:mainQueue</span><br><span class="line">                                             usingBlock:^(<span class="built_in">CMTime</span> time) &#123;</span><br><span class="line">                                                 <span class="comment">// Use weak reference to self</span></span><br><span class="line">                                                 <span class="comment">// Update player transport UI</span></span><br><span class="line">                                                 <span class="keyword">float</span> currentPlayTime = (<span class="keyword">float</span>)item.currentTime.value/ item.currentTime.timescale;</span><br><span class="line">                                                 [WeakSelf updateTransportBar:currentPlayTime];</span><br><span class="line">                                             &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)dealloc &#123;</span><br><span class="line">  [_player removeTimeObserver:_timeObserverToken];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Handle-Playback-End"><a href="#Handle-Playback-End" class="headerlink" title="Handle Playback End"></a>Handle Playback End</h4><p><code>AVPlayerItem</code> has several notifications for different activities.</p>
+<ol>
+<li><code>AVPlayerItemTimeJumpedNotification</code></li>
+<li><code>AVPlayerItemDidPlayToEndTimeNotification</code></li>
+<li><code>AVPlayerItemFailedToPlayToEndTimeNotification</code></li>
+<li><code>AVPlayerItemPlaybackStalledNotification</code></li>
+<li><code>AVPlayerItemNewAccessLogEntryNotification</code></li>
+<li><code>AVPlayerItemNewErrorLogEntryNotification</code></li>
+</ol>
+<p>We can use these to track current playback. For handling playback end:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Add Observer</span></span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(handlePlayerDidFinishPlaying:)</span><br><span class="line">                                             name:<span class="built_in">AVPlayerItemDidPlayToEndTimeNotification</span></span><br><span class="line">                                           object:[<span class="keyword">self</span>.player currentItem]];</span><br><span class="line">                                           </span><br><span class="line">- (<span class="keyword">void</span>)handlePlayerDidFinishPlaying:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">    <span class="built_in">AVPlayerItem</span> *playerItem = (<span class="built_in">AVPlayerItem</span> *)notification.object;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Jump to the beginning of the video</span></span><br><span class="line">    [playerItem seekToTime:kCMTimeZero];</span><br><span class="line">    <span class="comment">// pause the video</span></span><br><span class="line">    [player pause];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Handle-Interruption"><a href="#Handle-Interruption" class="headerlink" title="Handle Interruption"></a>Handle Interruption</h4><p>When AVPlayer got interrupted, current playback will pause. We can listen to the notification comes from AVAudioSession, but don’t forget to activate AVAudioSession.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Configure AVAudioSession and activate it when you init your avplayer controller</span></span><br><span class="line"><span class="comment">// Setup audio session catagory, use playback for video playback</span></span><br><span class="line"><span class="built_in">AVAudioSession</span> *session = [<span class="built_in">AVAudioSession</span> sharedInstance];</span><br><span class="line">        </span><br><span class="line"><span class="built_in">NSError</span> *error;</span><br><span class="line"><span class="keyword">if</span> (![session setCategory:<span class="built_in">AVAudioSessionCategoryPlayback</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Category Error: %@"</span>, [error localizedDescription]);</span><br><span class="line">&#125;</span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> (![session setActive:<span class="literal">YES</span> error:&amp;error]) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Activation Error: %@"</span>, [error localizedDescription]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// Add Observer</span></span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(handleSessionInterruption:)</span><br><span class="line">                                             name:<span class="built_in">AVAudioSessionInterruptionNotification</span></span><br><span class="line">                                           object:<span class="literal">nil</span>];</span><br><span class="line">                                           </span><br><span class="line">- (<span class="keyword">void</span>)handleSessionInterruption:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">    <span class="built_in">AVAudioSessionInterruptionType</span> type = [notification.userInfo[<span class="built_in">AVAudioSessionInterruptionTypeKey</span>] unsignedIntegerValue];</span><br><span class="line">    <span class="keyword">if</span> (type == <span class="built_in">AVAudioSessionInterruptionTypeBegan</span>) &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// pause the video</span></span><br><span class="line">        [<span class="keyword">self</span>.player pause];</span><br><span class="line">        </span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type == <span class="built_in">AVAudioSessionInterruptionTypeEnded</span>) &#123;</span><br><span class="line">        <span class="comment">// resume the video ??</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Handle-Route-Change"><a href="#Handle-Route-Change" class="headerlink" title="Handle Route Change"></a>Handle Route Change</h4><p>We will use the notification comes from <code>AVAudioSession</code> again to handle route change.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Add Observer</span></span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(handleRouteChange:)</span><br><span class="line">                                             name:<span class="built_in">AVAudioSessionRouteChangeNotification</span></span><br><span class="line">                                           object:<span class="literal">nil</span>];</span><br><span class="line">                                           </span><br><span class="line">- (<span class="keyword">void</span>)handleRouteChange:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">AVAudioSessionRouteChangeReason</span> reason = [notification.userInfo[<span class="built_in">AVAudioSessionRouteChangeReasonKey</span>] unsignedIntegerValue];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (reason == <span class="built_in">AVAudioSessionRouteChangeReasonOldDeviceUnavailable</span>) &#123;</span><br><span class="line">        <span class="built_in">AVAudioSessionRouteDescription</span> *preRoute = notification.userInfo[<span class="built_in">AVAudioSessionRouteChangePreviousRouteKey</span>];</span><br><span class="line">        <span class="built_in">NSString</span> *portType = [[preRoute.outputs firstObject] portType];</span><br><span class="line">        <span class="keyword">if</span> ([portType isEqualToString:<span class="built_in">AVAudioSessionPortHeadphones</span>]) &#123;</span><br><span class="line">            <span class="comment">// This notification was send from other thread, pop up error message under main thread</span></span><br><span class="line">            <span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">                <span class="comment">// pause the video</span></span><br><span class="line">                [<span class="keyword">self</span> pause];</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Handle-Fail-Play-To-End"><a href="#Handle-Fail-Play-To-End" class="headerlink" title="Handle Fail Play To End"></a>Handle Fail Play To End</h4><p><code>AVPlayerItemFailedToPlayToEndTimeNotification</code>. In most cases, we will get this notification when we play streaming video and you got network problem.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Add Observer</span></span><br><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span></span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(handleAVPlayerItemFailedToPlayToEndTime:) </span><br><span class="line">                                             name:<span class="built_in">AVPlayerItemFailedToPlayToEndTimeNotification</span></span><br><span class="line">                                           object:<span class="literal">nil</span>];</span><br><span class="line">                                           </span><br><span class="line">- (<span class="keyword">void</span>)handleAVPlayerItemFailedToPlayToEndTime:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">    <span class="built_in">NSError</span> *error = notification.userInfo[<span class="built_in">AVPlayerItemFailedToPlayToEndTimeErrorKey</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// This notification was send from other thread, pop up error message under main thread</span></span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">        [<span class="keyword">self</span> popErrorAlert:error];</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Here is the <a href="https://github.com/JasonHan1990/AVFoundation-Learning/tree/master/03-AVPlayer" target="_blank" rel="noopener">Test App</a></p>
+<div class="video-container"><iframe src="//player.vimeo.com/video/232612199" frameborder="0" allowfullscreen></iframe></div>
+            
+
+        </div>
+    </div>
+    <!-- projects grid -->
+    
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVFoundation/">AVFoundation</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVPlayer/">AVPlayer</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2018/09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="PREVIOUS: Blog moving notice">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../avfoundation-avassets/" data-tooltip="AVAssets - AVFoundation" aria-label="NEXT: AVAssets - AVFoundation">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/&amp;title=AVPlayer - AVFoundation" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#gitment">
+                         <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitment"></div>
+            
+        
+    </div>
+</article>
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2018 Juncheng Han. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2018/09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="PREVIOUS: Blog moving notice">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../avfoundation-avassets/" data-tooltip="AVAssets - AVFoundation" aria-label="NEXT: AVAssets - AVFoundation">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/&amp;title=AVPlayer - AVFoundation" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#gitment">
+                         <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/">
+                    <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/&amp;title=AVPlayer - AVFoundation">
+                    <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Juncheng Han</h4>
+        
+            <div id="about-card-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>iOS and NodeJS Dev</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Sunnyvale, CA
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="../../../../assets/js/jquery.js"></script>
+<script src="../../../../assets/js/jquery.fancybox.js"></script>
+<script src="../../../../assets/js/thumbs.js"></script>
+<script src="../../../../assets/js/tranquilpeak.js"></script>
+<!--SCRIPTS END-->
+
+    
+        <script type="text/javascript">
+            (function() {
+                function render() {
+                    new Gitment({
+                        id: 'https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/',
+                        owner: 'JasonHan1990',
+                        repo: 'https://github.com/JasonHan1990/jasonhan1990.github.io',
+                        oauth: {
+                            client_id: '98c7602426efbe53d94e',
+                            client_secret: '44c9f5da65e87c00adf9b961db5ddd6678964969',
+                        }
+                    }).render('gitment');
+                }
+                var gc = document.createElement('script');
+                gc.type = 'text/javascript';
+                gc.src = '//imsun.github.io/gitment/dist/gitment.browser.js';
+                gc.charset = 'UTF-8';
+                gc.onload = render;
+                gc.async = true;
+                document.querySelector('body').appendChild(gc);
+                var gcs = document.createElement('link');
+                gcs.href = '//imsun.github.io/gitment/style/default.css';
+                gcs.type = 'text/css';
+                gcs.rel = 'stylesheet';
+                gcs.media = 'screen,print';
+                document.querySelector('head').appendChild(gcs);
+            })();
+	    </script>
+    
+
+
+
+    </body>
+</html>
