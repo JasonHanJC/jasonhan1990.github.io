@@ -42,6 +42,34 @@
   </entry>
   
   <entry>
+    <title>AVAssets - AVFoundation</title>
+    <link href="https://jasonhan1990.github.io/2017/08/21/avfoundation-avassets/"/>
+    <id>https://jasonhan1990.github.io/2017/08/21/avfoundation-avassets/</id>
+    <published>2017-08-22T01:43:54.000Z</published>
+    <updated>2018-09-27T01:50:30.832Z</updated>
+    
+    <content type="html"><![CDATA[<p><code>AVAsset</code> is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVAsset is not the media itself, but acts as a container for timed media. It is composed of one or more media tracks along with metadata describing its contents.</p><a id="more"></a><p><code>AVAsset</code> confirms the <code>AVAsynchronousKeyValueLoading</code> protocol. We can querying an asset’s properties asynchronously.</p><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// check for status for a key</span></span><br><span class="line">- (<span class="built_in">AVKeyValueStatus</span>)statusOfValueForKey:(<span class="built_in">NSString</span> *)key error:(<span class="built_in">NSError</span> * _Nullable * _Nullable)outError;</span><br><span class="line"><span class="comment">// asynchronously load properties by given keys </span></span><br><span class="line">- (<span class="keyword">void</span>)loadValuesAsynchronouslyForKeys:(<span class="built_in">NSArray</span>&lt;<span class="built_in">NSString</span> *&gt; *)keys completionHandler:(<span class="keyword">nullable</span> <span class="keyword">void</span> (^)(<span class="keyword">void</span>))handler;</span><br></pre></td></tr></table></figure><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// example </span></span><br><span class="line"><span class="comment">// Load the asset's "playable" key</span></span><br><span class="line">[asset loadValuesAsynchronouslyForKeys:@[<span class="string">@"playable"</span>] completionHandler:^&#123;</span><br><span class="line">    <span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line">    <span class="built_in">AVKeyValueStatus</span> status =</span><br><span class="line">        [asset statusOfValueForKey:<span class="string">@"playable"</span> error:&amp;error];</span><br><span class="line">    <span class="keyword">switch</span> (status) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="built_in">AVKeyValueStatusLoaded</span>:</span><br><span class="line">            <span class="comment">// Successfully loaded, continue processing</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="built_in">AVKeyValueStatusFailed</span>:</span><br><span class="line">            <span class="comment">// Examine NSError pointer to determine failure</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="built_in">AVKeyValueStatusCancelled</span>:</span><br><span class="line">            <span class="comment">// Loading cancelled</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// Handle all other cases</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure><p>Note that:<br>The completionHandler block will be called only once per invocation of loadValuesAsynchronouslyForKeys:completionHandler:, no matter how many keys you pass to this methods.<br>We need to call status statusOfValueForKey:error: on each property you requested.</p><p><a href="https://developer.apple.com/documentation/avfoundation/avasset" target="_blank" rel="noopener">https://developer.apple.com/documentation/avfoundation/avasset</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;code&gt;AVAsset&lt;/code&gt; is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVAsset is not the media itself, but acts as a container for timed media. It is composed of one or more media tracks along with metadata describing its contents.&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/tags/iOS/"/>
+    
+      <category term="AVFoundation" scheme="https://jasonhan1990.github.io/tags/AVFoundation/"/>
+    
+      <category term="Objc" scheme="https://jasonhan1990.github.io/tags/Objc/"/>
+    
+      <category term="AVAssets" scheme="https://jasonhan1990.github.io/tags/AVAssets/"/>
+    
+  </entry>
+  
+  <entry>
     <title>AVAudioRecorder - AVFoundation</title>
     <link href="https://jasonhan1990.github.io/2017/08/16/avfoundation-avaudiorecorder/"/>
     <id>https://jasonhan1990.github.io/2017/08/16/avfoundation-avaudiorecorder/</id>
