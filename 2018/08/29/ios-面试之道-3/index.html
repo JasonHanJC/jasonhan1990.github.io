@@ -6,42 +6,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="JasonH&#39;s Blog">
-    <title>Archives - JasonH&#39;s Blog</title>
+    <title>《iOS面试之道》阅读笔记（3） - JasonH&#39;s Blog</title>
     <meta name="author" content="Juncheng Han">
     
     
         <link rel="icon" href="/assets/images/favicn.png">
     
     
-        <link rel="alternate" type="application/atom+xml" title="RSS" href="../atom.xml">
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{}</script>
-    <meta name="description" content="Juncheng Han">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"Swift直接跳到Swift语言吧。Swift很快很安全，而且就我的感受来说，写Swift有一种写脚本语言的快感。但是Swift还有很多路要走，现在最感到头疼的就是和ObjC的混编吧。\n我在这里就按照书中的顺序来做个笔记和添加我所知道的更多知识。\nClass和Struct和Enum对于Class和Struct，一个是引用类型，一个是值类型我就不赘述了，书里写的很清楚。\n先说说Struct：默认下Struct内部的函数是不能修改Struct内部的属性（properties）的，但是我们可以在func前面加mutating关键字来打破默认。例如下面的doSomethingToInternalProperties()。\n123456789101112131415161718192021222324struct TV &#123;    var height: Float    var width: Float    static var Tag = \"electronics\"        var diagonals: Int &#123;      // calculated here      return result    &#125;      var spaceTaken: Double &#123;      get &#123;        // calculate here        return result      &#125;      set &#123;        height = Double(newValue)      &#125;      &#125;        mutating func doSomethingToInternalProperties() &#123;        // do something    &#125;&#125;\n更多：\n上面的例子里一共有三种不同的属性（properties）。\n\nheight和width是实例属性（instance properties）。这种属性存储了关于一个实例的信息，如高和宽的具体数值。\ndiagonals是计算属性（Computed Propertie）。这种属性其实根本就不存储任何值，它只是提供了一个getter或者setter让你直接获取一些计算后的值或直接修改实例属性。\nTags是类属性，开头要用static关键字。即不需要创建实例就能获得的关于这个类的属性。let tvTag = TV.Tag\n\n然后Enum：个人感觉Swift的Enum真的很强大啊，可以有不同的case，也可以有func。Enum和Struct很相似，就不赘述了。我们体验Enum的强大吧，下面是用Enum做一个数学表达式，然后用Enum内部的函数来求值。\n123456789101112131415161718192021// exampleindirect enum Expression &#123;  case number(Int)  case add(Expression, Expression)    func evaluate() -&gt; Int &#123;    switch self &#123;    case let .number(value):      return value    case let .add(left, right):      return left.evaluate() + right.evaluate()    &#125;  &#125;&#125;var first = Expression.number(50)var second = Expression.number(12)var sum = Expression.add(first, second)second.evaluate() // 12first.evaluate() // 50sum.evaluate() // 62\n解释一下，这里定义了一个数学表达式Expression的Enum。数学表达式有很多很多中，这里我写了：\n\n代表一个整数的表达式number(Int)\n和加法表达式add(Expression, Expression)，之所以括号里面的类型是Expression，是因为它不仅可能是两个整数相加，也可能是两个相加的表达式在求和，类似于（1 + 2）+ 3。\n\n然后内部有一个求值的方程，他会判断，如果这个表达式是一个整数表达式，那么就返回整数的值，如果是加法表达式，这里用到递归，左边表达式求值后再加上右边表达式的值。\n你看的没错，Enum里面可以用递归嵌套。这是因为有递归嵌套，所以Enum前面需要加上indirect关键字。\n最后Class：对比与Struct的区别，一个是传递的值得类型不同，另一个是Struct中的属性（properties）是可以不初始化的，就像上面的列子里，height和width我都没有初始化，甚至这两个属性我都没有定义为optional。\n但是Class中的属性是要定义的，如果你不定义，那么你多半会得到Class ‘XXX’ has no initializers这样的错误警告。例子：\n123456789101112131415161718192021222324// Compiler error: Class 'Address' has no initializersclass Address &#123;    var street: String&#125;// you can solve by these ways// add a init functionclass Address &#123;    var street: String        init(street: String) &#123;      self.street = street    &#125;&#125;// init the street by defaultclass Address &#123;    var street: String = \"\"&#125;// set street to optionalclass Address &#123;    var street: String?&#125;\n更多：Class作为对象当然是可以继承的。一个类继承另一个类后，可以覆盖（override）它父类func的实现方法。如果你不希望子类获得这样的能力，你可以在父类的func前面加上final关键字。Swift不允许类的多继承。\n在Swift里面，比较推荐用protocal来代替继承，因为继承会增加程序见的耦合度，增加程序出错的可能性。用protocal的话，就是底耦合度，protocal类似于Java的interface，protocal提供所需的属性和方法，但不实现他们。这些属性和方法由遵循（comfirm）该协议的类来实现。\n我看书的目录有关于面向协议的编程一节，这里就不多说了，看到那一节在说。\nOptional：简单理解，就是定义一个value能不能是空的（nil）。一般用if let else或是guard let else来判断。\n用guard比if let的好处在于，可以减少if else的嵌套。\nProtocol协议：Swift中的协议真的用法很灵活，大家做好多看看官方Swift教科书。这里列出一些：\n\nClass，Struct，Enum都可以遵循Protocal。你也可以通过在protocal前面加@objc或是在protocal后加class来强制只有Class能用这个Protocal\n\n1234567@objc protocol SomeProtocal &#123;&#125;// 或者protocol SomeProtocal: class &#123;&#125;\n\nprotocal可以定义特定的初始化方法。Class在实现这类初始化方法时，前面要加require。\n\n123456789101112131415161718192021222324protocol SomeProtocal &#123;    var aVar: Int &#123; get set &#125;    init()&#125;class SomeClass: SomeProtocal &#123;        var aVar: Int        required init() &#123;        aVar = 7    &#125;        init(_ aVar: Int) &#123;        self.aVar = aVar    &#125;&#125;struct SomeStruct: SomeProtocal &#123;    var aVar: Int    init() &#123;        aVar = 7    &#125;&#125;\n\nprotocal可以作为一个类来成为（protocal as type）：\n一个方程的返回值类型\n一个值和属性的类型\n数组，字典或者其他容器中存储值得类型\n\n\n\n1234567891011121314151617181920protocol Vehicle &#123;&#125;struct Car: Vehicle &#123;&#125;struct Bike: Vehicle &#123;&#125;let car = Car(), bike = Bike()var vehicles : [Vehicle] = [car, bike]// 更多：类型判定vehicles.forEach &#123; v in    if v is Car &#123;        print(\"I'm a car\")    &#125; else if v is Bike &#123;        print(\"I'm a bike\")    &#125;&#125;\n\n一个class或struct可以继承多个协议。\n默认下，继承协议的class和struct必须实现协议中的所有属性和方法。但是可以通过转化Swift协议到ObjC协议来增加optional。\n\n1234@objc protocol SomeProtocal &#123;    @objc optional func someMethod() -&gt; Int    @objc optional var someProperty: Int &#123; get &#125;&#125;\n\n代理（Delegation）不是协议（Protocal），它是iOS中的一种设计模式，但是依赖于协议这个技术。用代理的好处在于，委托方不会知道代理方的任何内部情况，通过协议，委托方制定代理方需要实现的功能，然后委托方按照协议实现功能就好了。代理是可以传递消息的，它也是iOS种的一种消息传递方式（其他有：通知NSNotification，Block或Closure，target action，KVO）。\n\n泛型Generic：书里面简单介绍的Swift泛型怎么用。在实际运用的时候，我们也可以限制泛型值的类型。看个例子，下面的方程返回泛型数组中一个特定值的下标。\n12345678func findIndex&lt;T&gt;(of valueToFind: T, in array:[T]) -&gt; Int? &#123;    for (index, value) in array.enumerated() &#123;        if value == valueToFind &#123;            return index        &#125;    &#125;    return nil&#125;\n这段程序是有问题的，因为不是所有类型的值都能使用==来判断相等，特别是工程师自己写的类。只有满足实现了Equatable协议的Class和Struct，程序才能正常运行。所以我们可以对泛型T做限制。\n12345678func findIndex&lt;T: Equatable&gt;(of valueToFind: T, in array:[T]) -&gt; Int? &#123;    // same as above&#125;// 或者用where关键字func findIndex&lt;T&gt;(of valueToFind: T, in array:[T]) -&gt; Int? where T: Equatable &#123;    // same as above&#125;\nOpen vs. Publicopen \n\nopen 修饰的 class 在 Module 内部和外部都可以被访问和继承\nopen 修饰的 func 在 Module 内部和外部都可以被访问和重载（override)\n\npublic \n\npublic 修饰的 class 在 Module 内部可以访问和继承，在外部只能访问\npublic 修饰的 func 在 Module 内部可以被访问和重载（override）,在外部只能访问\n\nCopy-on-writeSwift将很多ObjC中的数据类型从引用类（reference type）改成了值类（value type）。这样及降低了内存泄露的风险，也提高了内存效率。书中给了一个例子：\n123456// arrayA 是一个数组，为值类型let arrayA = [1, 2, 3]// arrayB 这个时候与 arrayA 在内存中是同一个东西，内存中并没有生成新的数组let arrayB = arrayA// arrayB 被修改了，此时 arrayB 在内存中变成了一个新的数组，而不是原来的 arrayAarrayB.append(4)\n然后说到，当arrayB没有改变的时候，arrayB和arrayA指向同一个内存。意思就是他们应该有相同的address。\n然后我就像去证明一下，首先通过看官方文献我找到了这样一个方程来返回地址withUnsafePointer(to:_:)。\n12345678910111213var array1: [Int] = [0, 1, 2, 3]var array2 = array1withUnsafePointer(to: &amp;array1) &#123;    print(\" 1 has address: \\($0)\")&#125;withUnsafePointer(to: &amp;array2) &#123;    print(\" 2 has address: \\($0)\")&#125;// 输出：// 1 has address: 0x000000011aabf4d0// 2 has address: 0x000000011aabf4d8\n结果输出地址不一样，我当时就很怀疑人生，然后翻看一些书籍和别人的博客寻求答案。我看到的各种东西都证明《iOS面试之道》里是正确的，但是证明呢？\n接着我看到了这个方法，用UnsafeRawPointer。\n123456789func print(address o: UnsafeRawPointer ) &#123;    print(String(format: \"%p\", Int(bitPattern: o)))&#125;var array1: [Int] = [0, 1, 2, 3]var array2 = array1print(address: array1) //0x60c00006f4a0print(address: array2) //0x60c00006f4a0\n终于得到了相同的地址。那么UnsafeRawPointer和UnsafePointer的区别是什么，我的理解是，UnsafeRawPointer是指向没有类型（untyped）的数据，可以理解为存在内存中裸的数据，例子中就是0在内存中所在位置，而UnsafePointer是指向有类型（typed）的数据，例子中应该是指向我们建立的Array在内存中的地址。\nstatic methods vs. class methods\nstatic 和 class都是用来指定类方法\nclass关键字指定的类方法 可以被 override\nstatic关键字指定的类方法 不能被 override\n\nas? vs. as!这个属于Swift的类型转换（type cast）。\n\nas? - 表示这个类型转换过程是optional的。被赋予的值肯定是一个optional的值。如果类型转换失败，返回nil。\nas! - 表示这个类型转换过程不是optional的. System will crash if down casting fails.如果类型转换失败，程序崩溃。\n\n加了些我知道的，但是书里没有提及的知识，先这么多吧，我以前的笔记挺乱的，整理好了有什么要加的在加进来。\nReference：https://xiaozhuanlan.com/ios-interview 故胤道长和唐巧两位大神的书《iOS 面试之道》https://swiftdoc.org/https://developer.apple.com/documentation/swift/unsaferawpointer\n","dateCreated":"2018-08-29T19:45:36-07:00","dateModified":"2018-10-04T12:34:05-07:00","datePublished":"2018-08-29T19:45:36-07:00","description":"","headline":"《iOS面试之道》阅读笔记（3）","image":["ios-面试之道.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/","keywords":"Swift, iOS, 读书笔记, iOS面试","thumbnailUrl":"ios-面试之道.png"}</script>
+    <meta name="description" content="Swift直接跳到Swift语言吧。Swift很快很安全，而且就我的感受来说，写Swift有一种写脚本语言的快感。但是Swift还有很多路要走，现在最感到头疼的就是和ObjC的混编吧。 我在这里就按照书中的顺序来做个笔记和添加我所知道的更多知识。 Class和Struct和Enum对于Class和Struct，一个是引用类型，一个是值类型我就不赘述了，书里写的很清楚。 先说说Struct：默认下S">
+<meta name="keywords" content="Swift,iOS,读书笔记,iOS面试">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="JasonH&#39;s Blog">
-<meta property="og:url" content="https://jasonhan1990.github.io/archives/index.html">
+<meta property="og:title" content="《iOS面试之道》阅读笔记（3）">
+<meta property="og:url" content="https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/index.html">
 <meta property="og:site_name" content="JasonH&#39;s Blog">
-<meta property="og:description" content="Juncheng Han">
+<meta property="og:description" content="Swift直接跳到Swift语言吧。Swift很快很安全，而且就我的感受来说，写Swift有一种写脚本语言的快感。但是Swift还有很多路要走，现在最感到头疼的就是和ObjC的混编吧。 我在这里就按照书中的顺序来做个笔记和添加我所知道的更多知识。 Class和Struct和Enum对于Class和Struct，一个是引用类型，一个是值类型我就不赘述了，书里写的很清楚。 先说说Struct：默认下S">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-10-04T19:34:05.576Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JasonH&#39;s Blog">
-<meta name="twitter:description" content="Juncheng Han">
+<meta name="twitter:title" content="《iOS面试之道》阅读笔记（3）">
+<meta name="twitter:description" content="Swift直接跳到Swift语言吧。Swift很快很安全，而且就我的感受来说，写Swift有一种写脚本语言的快感。但是Swift还有很多路要走，现在最感到头疼的就是和ObjC的混编吧。 我在这里就按照书中的顺序来做个笔记和添加我所知道的更多知识。 Class和Struct和Enum对于Class和Struct，一个是引用类型，一个是值类型我就不赘述了，书里写的很清楚。 先说说Struct：默认下S">
     
     
         
     
     
-        <meta property="og:image" content="https://jasonhan1990.github.io../assets/images/avatar.jpg"/>
+        <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
     
+    
+        <meta property="og:image" content="https://jasonhan1990.github.ioios-面试之道.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioios-面试之道.png" />
     
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../assets/css/all.css">
-    <link rel="stylesheet" href="../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../assets/css/materialize.css">
+    <link rel="stylesheet" href="../../../../assets/css/all.css">
+    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -66,7 +71,7 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../ ">JasonH&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../ ">JasonH&#39;s Blog</a>
     </div>
     
         
@@ -91,8 +96,8 @@
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
-                <a href="../#about">
-                    <img class="sidebar-profile-picture" src="../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+                <a href="../../../../#about">
+                    <img class="sidebar-profile-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">Juncheng Han</h4>
                 
@@ -107,7 +112,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../ "
+                             href="../../../../ "
                             
                             title="Home"
                         >
@@ -120,7 +125,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../projects"
+                             href="../../../../projects"
                             
                             title="Projects"
                         >
@@ -133,7 +138,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../all-categories"
+                             href="../../../../all-categories"
                             
                             title="Categories"
                         >
@@ -146,7 +151,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../all-tags"
+                             href="../../../../all-tags"
                             
                             title="Tags"
                         >
@@ -159,7 +164,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../all-archives"
+                             href="../../../../all-archives"
                             
                             title="Archives"
                         >
@@ -216,7 +221,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../atom.xml"
+                             href="../../../../atom.xml"
                             
                             title="RSS"
                         >
@@ -237,71 +242,18 @@
                         hasCoverMetaIn
                         ">
                 
-    <section class="postShorten-group main-content-wrap">
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2018/09/17/blog-moving-notice/">
-                            Blog moving notice
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-09-17T19:36:10-07:00">
-	
-		    Sep 17, 2018
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/Other/">Other</a>
 
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    <p>I am starting to move my previous blog and project page from Squrespace to Github page starting today. All posts will keep the same publishing date as before. After finishing moving, I will link my personal domain <a href="http://www.junchenghan.com" target="_blank" rel="noopener">www.junchenghan.com</a> to this Github page.</p>
-<p>Thanks.</p>
-
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="../2018/09/17/blog-moving-notice/#post-footer" class="postShorten-excerpt_link link">
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
+<article class="post">
     
     
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2018/08/29/ios-面试之道-3/">
-                            《iOS面试之道》阅读笔记（3）
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            《iOS面试之道》阅读笔记（3）
+        </h1>
+    
+    
+        <div class="post-meta">
     <time datetime="2018-08-29T19:45:36-07:00">
 	
 		    Aug 29, 2018
@@ -310,16 +262,20 @@
     
         <span>in </span>
         
-    <a class="category-link" href="../categories/iOS/">iOS</a>
+    <a class="category-link" href="../../../../categories/iOS/">iOS</a>
 
 
     
 </div>
 
-            </div>
-            
-                <div class="postShorten-content">
-                    <h1 id="Swift"><a href="#Swift" class="headerlink" title="Swift"></a>Swift</h1><p>直接跳到Swift语言吧。Swift很快很安全，而且就我的感受来说，写Swift有一种写脚本语言的快感。但是Swift还有很多路要走，现在最感到头疼的就是和ObjC的混编吧。</p>
+    
+</div>
+
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="Swift"><a href="#Swift" class="headerlink" title="Swift"></a>Swift</h1><p>直接跳到Swift语言吧。Swift很快很安全，而且就我的感受来说，写Swift有一种写脚本语言的快感。但是Swift还有很多路要走，现在最感到头疼的就是和ObjC的混编吧。</p>
 <p>我在这里就按照书中的顺序来做个笔记和添加我所知道的更多知识。</p>
 <h2 id="Class和Struct和Enum"><a href="#Class和Struct和Enum" class="headerlink" title="Class和Struct和Enum"></a>Class和Struct和Enum</h2><p>对于Class和Struct，一个是引用类型，一个是值类型我就不赘述了，书里写的很清楚。</p>
 <h3 id="先说说Struct："><a href="#先说说Struct：" class="headerlink" title="先说说Struct："></a>先说说Struct：</h3><p>默认下Struct内部的函数是不能修改Struct内部的属性（properties）的，但是我们可以在<code>func</code>前面加<code>mutating</code>关键字来打破默认。例如下面的doSomethingToInternalProperties()。</p>
@@ -410,459 +366,104 @@
 <p>加了些我知道的，但是书里没有提及的知识，先这么多吧，我以前的笔记挺乱的，整理好了有什么要加的在加进来。</p>
 <p>Reference：<br><a href="https://xiaozhuanlan.com/ios-interview" target="_blank" rel="noopener">https://xiaozhuanlan.com/ios-interview</a> 故胤道长和唐巧两位大神的书《iOS 面试之道》<br><a href="https://swiftdoc.org/" target="_blank" rel="noopener">https://swiftdoc.org/</a><br><a href="https://developer.apple.com/documentation/swift/unsaferawpointer" target="_blank" rel="noopener">https://developer.apple.com/documentation/swift/unsaferawpointer</a></p>
 
-                    
-                        
-
-                    
-                    
-                        <p>
-                            <a href="../2018/08/29/ios-面试之道-3/#post-footer" class="postShorten-excerpt_link link">
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
             
+
         </div>
+    </div>
+    <!-- projects grid -->
+    
+    <div id="post-footer" class="post-footer main-content-wrap">
         
-            <a href="../2018/08/29/ios-面试之道-3/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/ios-面试之道.png"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2018/08/28/ios-面试之道-2/">
-                            《iOS面试之道》阅读笔记（2）
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-08-28T19:16:24-07:00">
-	
-		    Aug 28, 2018
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS面试/">iOS面试</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/读书笔记/">读书笔记</a>
 
             </div>
-            
-                <div class="postShorten-excerpt">
-                    <h2 id="更多数据结构"><a href="#更多数据结构" class="headerlink" title="更多数据结构"></a>更多数据结构</h2>
-                    
-                        <a href="../2018/08/28/ios-面试之道-2/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
         
-            <a href="../2018/08/28/ios-面试之道-2/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2018/08/28/ios-面试之道-2/ios-面试之道.png"/>
-                </div>
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="PREVIOUS: Blog moving notice">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../28/ios-面试之道-2/" data-tooltip="《iOS面试之道》阅读笔记（2）" aria-label="NEXT: 《iOS面试之道》阅读笔记（2）">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/&amp;title=《iOS面试之道》阅读笔记（3）" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
             
         
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
+        <li class="post-action">
             
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2018/08/27/ios-面试之道-1/">
-                            《iOS面试之道》阅读笔记（1）
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2018-08-27T14:37:42-07:00">
-	
-		    Aug 27, 2018
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
-
-            </div>
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
             
-                <div class="postShorten-excerpt">
-                    <h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2>
-                    
-                        <a href="../2018/08/27/ios-面试之道-1/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="../2018/08/27/ios-面试之道-1/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2018/08/27/ios-面试之道-1/ios-面试之道.png"/>
-                </div>
+                <i class="fa fa-list" aria-hidden="true"></i>
             </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2017/08/21/avfoundation-avplayer/">
-                            AVPlayer - AVFoundation
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2017-08-21T19:37:17-07:00">
-	
-		    Aug 21, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <h4 id="AVPlayer"><a href="#AVPlayer" class="headerlink" title="AVPlayer"></a>AVPlayer</h4><p>AVFoundation provides a controller class <code>AVPlayer</code> to play timed audio-visual media. The AVPlayer can handle playback of local, progressively downloaded and streamed media conforming HLS protocol. </p>
-                    
-                        <a href="../2017/08/21/avfoundation-avplayer/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="../2017/08/21/avfoundation-avplayer/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2017/08/21/avfoundation-avplayer/AVFoundation.png"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2017/08/21/avfoundation-avassets/">
-                            AVAssets - AVFoundation
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2017-08-21T18:43:54-07:00">
-	
-		    Aug 21, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p><code>AVAsset</code> is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVAsset is not the media itself, but acts as a container for timed media. It is composed of one or more media tracks along with metadata describing its contents.</p>
-                    
-                        <a href="../2017/08/21/avfoundation-avassets/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="../2017/08/21/avfoundation-avassets/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2017/08/21/avfoundation-avassets/AVFoundation.png"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2017/08/16/avfoundation-avaudiorecorder/">
-                            AVAudioRecorder - AVFoundation
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2017-08-16T14:38:24-07:00">
-	
-		    Aug 16, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p><code>AVAudioRecorder</code> is also built on top of Audio Queue Services. It provides capability to:</p>
-<ul>
-<li>Record until user stop the recording</li>
-<li>Record for a specified duration</li>
-<li>Pause and resume recording</li>
-<li>Audio-level metering </li>
-</ul>
-                    
-                        <a href="../2017/08/16/avfoundation-avaudiorecorder/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="../2017/08/16/avfoundation-avaudiorecorder/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2017/08/16/avfoundation-avaudiorecorder/AVFoundation.png"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2017/08/15/avfoundation-avaudioplayer/">
-                            AVAudioPlayer - AVFoundation
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2017-08-15T14:03:50-07:00">
-	
-		    Aug 15, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p><code>AVAudioPlayer</code> makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.<br>
-                    
-                        <a href="../2017/08/15/avfoundation-avaudioplayer/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="../2017/08/15/avfoundation-avaudioplayer/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/AVFoundation.png"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2017/08/07/swift-refreshing/">
-                            Swift Refreshing
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2017-08-07T22:38:44-07:00">
-	
-		    Aug 07, 2017
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p>This is the note for swift knowledge refreshing.<br>
-                    
-                        <a href="../2017/08/07/swift-refreshing/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="../2017/08/07/swift-refreshing/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2017/08/07/swift-refreshing/Swift.png"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a class="link-unstyled" href="../2016/11/23/nstimer/">
-                            NSTimer
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2016-11-23T22:09:17-08:00">
-	
-		    Nov 23, 2016
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../categories/iOS/">iOS</a>
-
-
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p>I will talk about NSTimer in this order.</p>
-<ol>
-<li>Initial a NSTimer</li>
-<li>Invalidate a NSTimer</li>
-<li>NSTimer and runloop</li>
-</ol>
-                    
-                        <a href="../2016/11/23/nstimer/" class="postShorten-excerpt_link link">
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-            <a href="../2016/11/23/nstimer/">
-                <div class="postShorten-thumbnailimg">
-                    <img alt="" src="https://jasonhan1990.github.io/2016/11/23/nstimer/timer.jpeg"/>
-                </div>
-            </a>
-            
-        
-    </article>
-    
-    <div class="pagination-bar">
-    <ul class="pagination">
-        
-        
-          <li class="pagination-next">
-            <a class="btn btn--default btn--small" href="page/2/">
-              <span>OLDER POSTS</span>
-              <i class="fa fa-angle-right text-base icon-ml"></i>
-            </a>
-          </li>
-        
-        <li class="pagination-number">page 1 of 2</li>
+        </li>
     </ul>
 </div>
 
-</section>
 
-
+        
+        
+            
+        
+    </div>
+</article>
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
@@ -871,6 +472,124 @@
 </footer>
 
             </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="PREVIOUS: Blog moving notice">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../28/ios-面试之道-2/" data-tooltip="《iOS面试之道》阅读笔记（2）" aria-label="NEXT: 《iOS面试之道》阅读笔记（2）">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/&amp;title=《iOS面试之道》阅读笔记（3）" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/">
+                    <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/08/29/ios-面试之道-3/&amp;title=《iOS面试之道》阅读笔记（3）">
+                    <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
             
         </div>
         
@@ -886,7 +605,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
+            <img id="about-card-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Juncheng Han</h4>
         
@@ -913,13 +632,15 @@
 
         
         
-<div id="cover" style="background-image:url('../assets/images/cover.jpg');"></div>
+<div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
-<script src="../assets/js/jquery.js"></script>
-<script src="../assets/js/jquery.fancybox.js"></script>
-<script src="../assets/js/thumbs.js"></script>
-<script src="../assets/js/tranquilpeak.js"></script>
+<script src="../../../../assets/js/jquery.js"></script>
+<script src="../../../../assets/js/jquery.fancybox.js"></script>
+<script src="../../../../assets/js/thumbs.js"></script>
+<script src="../../../../assets/js/tranquilpeak.js"></script>
 <!--SCRIPTS END-->
+
+    
 
 
 
