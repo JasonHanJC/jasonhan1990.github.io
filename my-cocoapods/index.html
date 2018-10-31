@@ -16,19 +16,22 @@
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../atom.xml">
     
     <script type="application/ld+json">{"@context":"http://schema.org","@type":"Website","@id":"https://jasonhan1990.github.io","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"name":"JasonH's Blog","description":"Juncheng Han","url":"https://jasonhan1990.github.io"}</script>
-    <meta name="description" content="JCCheckBoxJCCheckBox is simple and beautiful checkbox module written in ObjC. It is a subclass of UIControl. You can either use addTarget(_:action:for:) function to handle touch event or use block cal">
+    <meta name="description" content="JCBodymarkerCameraCocoaPods link: https://cocoapods.org/pods/JCBodymarkerCameraGitHub link: https://github.com/JasonHan1990/JCBodymarkerCamera JCBodymarkerCamera is a camera for body measurement. It h">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="My CocoaPods">
 <meta property="og:url" content="https://jasonhan1990.github.io/my-cocoapods/index.html">
 <meta property="og:site_name" content="JasonH&#39;s Blog">
-<meta property="og:description" content="JCCheckBoxJCCheckBox is simple and beautiful checkbox module written in ObjC. It is a subclass of UIControl. You can either use addTarget(_:action:for:) function to handle touch event or use block cal">
+<meta property="og:description" content="JCBodymarkerCameraCocoaPods link: https://cocoapods.org/pods/JCBodymarkerCameraGitHub link: https://github.com/JasonHan1990/JCBodymarkerCamera JCBodymarkerCamera is a camera for body measurement. It h">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="https://jasonhan1990.github.io/my-cocoapods/level-indicator.gif">
+<meta property="og:image" content="https://jasonhan1990.github.io/my-cocoapods/switch-button.gif">
+<meta property="og:image" content="https://jasonhan1990.github.io/my-cocoapods/countdown-shutter-button.gif">
 <meta property="og:image" content="https://jasonhan1990.github.io/my-cocoapods/jccheckbox.gif">
-<meta property="og:updated_time" content="2018-10-23T01:37:04.784Z">
+<meta property="og:updated_time" content="2018-10-31T00:35:25.887Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="My CocoaPods">
-<meta name="twitter:description" content="JCCheckBoxJCCheckBox is simple and beautiful checkbox module written in ObjC. It is a subclass of UIControl. You can either use addTarget(_:action:for:) function to handle touch event or use block cal">
-<meta name="twitter:image" content="https://jasonhan1990.github.io/my-cocoapods/jccheckbox.gif">
+<meta name="twitter:description" content="JCBodymarkerCameraCocoaPods link: https://cocoapods.org/pods/JCBodymarkerCameraGitHub link: https://github.com/JasonHan1990/JCBodymarkerCamera JCBodymarkerCamera is a camera for body measurement. It h">
+<meta name="twitter:image" content="https://jasonhan1990.github.io/my-cocoapods/level-indicator.gif">
     
     
         
@@ -267,11 +270,19 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <h3 id="JCCheckBox"><a href="#JCCheckBox" class="headerlink" title="JCCheckBox"></a>JCCheckBox</h3><p>JCCheckBox is simple and beautiful checkbox module written in ObjC. It is a subclass of UIControl. You can either use <code>addTarget(_:action:for:)</code> function to handle touch event or use block callback <code>checkCompletion</code> and <code>uncheckCompletion</code> to handle touch event.</p>
+            <h3 id="JCBodymarkerCamera"><a href="#JCBodymarkerCamera" class="headerlink" title="JCBodymarkerCamera"></a>JCBodymarkerCamera</h3><p>CocoaPods link: <a href="https://cocoapods.org/pods/JCBodymarkerCamera" target="_blank" rel="noopener">https://cocoapods.org/pods/JCBodymarkerCamera</a><br>GitHub link: <a href="https://github.com/JasonHan1990/JCBodymarkerCamera" target="_blank" rel="noopener">https://github.com/JasonHan1990/JCBodymarkerCamera</a></p>
+<p>JCBodymarkerCamera is a camera for body measurement. It has both front body marker and side body marker camera. It also has an indicator to show the vertical angle of your device.<br>Users can use both front facing camera and rear camera.<br>JCBodymarkerCamera only works with portrait position. It doesn’t contain the algorithm for body measurement. It is just a camera.</p>
+<p>JCBodymarkerCamera is built for iOS 10.2 or later.</p>
+<p>Video demo:</p>
+<iframe src="https://www.youtube.com/embed/NHVNaXOBt3c" width="100%" height="568px" frameborder="0" allowfullscreen></iframe>
+<p>The project has some interesting components, like JCCameraLevelView, JCSwitchCameraButton, JCShutterButton and etc.<br>JCCameraLevelView is working with JCDeviceMotionController. I use core motion framework to gather and process your device’s X-axis angle and Z-axis angle.</p>
+<p>if you are interested, feel free to take a look and use them.<br><div class="figure center" style="width:;"><a class="fancybox" href="level-indicator.gif" title="JCCameraLevelView - Vertical level indicator" data-caption="JCCameraLevelView - Vertical level indicator" data-fancybox="default"><img class="fig-img" src="level-indicator.gif" alt="JCCameraLevelView - Vertical level indicator"></a><span class="caption">JCCameraLevelView - Vertical level indicator</span></div><br><div class="figure center" style="width:;"><a class="fancybox" href="switch-button.gif" title="JCSwitchCameraButton - Camera switch button" data-caption="JCSwitchCameraButton - Camera switch button" data-fancybox="default"><img class="fig-img" src="switch-button.gif" alt="JCSwitchCameraButton - Camera switch button"></a><span class="caption">JCSwitchCameraButton - Camera switch button</span></div><br><div class="figure center" style="width:;"><a class="fancybox" href="countdown-shutter-button.gif" title="JCShutterButton - A countdown shutter button" data-caption="JCShutterButton - A countdown shutter button" data-fancybox="default"><img class="fig-img" src="countdown-shutter-button.gif" alt="JCShutterButton - A countdown shutter button"></a><span class="caption">JCShutterButton - A countdown shutter button</span></div></p>
+<hr>
+<h3 id="JCCheckBox"><a href="#JCCheckBox" class="headerlink" title="JCCheckBox"></a>JCCheckBox</h3><p>CocoaPods link: <a href="https://cocoapods.org/pods/JCCheckBox" target="_blank" rel="noopener">https://cocoapods.org/pods/JCCheckBox</a><br>GitHub link: <a href="https://github.com/JasonHan1990/JCCheckBox" target="_blank" rel="noopener">https://github.com/JasonHan1990/JCCheckBox</a></p>
+<p>JCCheckBox is simple and beautiful checkbox module written in ObjC. It is a subclass of UIControl. You can either use <code>addTarget(_:action:for:)</code> function to handle touch event or use block callback <code>checkCompletion</code> and <code>uncheckCompletion</code> to handle touch event.</p>
 <div class="figure center" style="width:;"><a class="fancybox" href="jccheckbox.gif" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="jccheckbox.gif" alt=""></a></div>
 <p>Example:</p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DEFAULT SIZE INIT</span></span><br><span class="line">JCCheckBox *ovalCheckBox = [JCCheckBox checkBox]; <span class="comment">// default size 24 by 24</span></span><br><span class="line"><span class="comment">// SET STYLE</span></span><br><span class="line"><span class="keyword">self</span>.ovalCheckBox.checkBoxStyle = JCCheckBoxStyleOval; <span class="comment">// square is the default</span></span><br><span class="line"><span class="comment">// CHANGE COLOR</span></span><br><span class="line"><span class="keyword">self</span>.ovalCheckBox.innerColor = &lt;<span class="meta">#UIColor#&gt;;</span></span><br><span class="line"><span class="keyword">self</span>.ovalCheckBox.outerColor = &lt;<span class="meta">#UIColor#&gt;;</span></span><br><span class="line"><span class="comment">// SET COMPLETION</span></span><br><span class="line"><span class="keyword">self</span>.ovalCheckBox.checkedCompletion = ^&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Checked"</span>);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">self</span>.ovalCheckBox.uncheckedCompletion = ^&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Unchecked"</span>);</span><br><span class="line">&#125;;</span><br><span class="line">[view addSubview:ovalCheckBox];</span><br></pre></td></tr></table></figure>
-<p>CocoaPods link: <a href="https://cocoapods.org/pods/JCCheckBox" target="_blank" rel="noopener">https://cocoapods.org/pods/JCCheckBox</a><br>GitHub link: <a href="https://github.com/JasonHan1990/JCCheckBox" target="_blank" rel="noopener">https://github.com/JasonHan1990/JCCheckBox</a></p>
 
             
 
