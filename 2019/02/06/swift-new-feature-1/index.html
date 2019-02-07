@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="JasonH&#39;s Blog">
-    <title>AVCapturePhotoSettings Reuse Error - JasonH&#39;s Blog</title>
+    <title>CaseIterable from Swift 4.2 - JasonH&#39;s Blog</title>
     <meta name="author" content="Juncheng Han">
     
     
@@ -15,19 +15,21 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"The error message when you reused an AVCapturePhotoSettings object is -[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] Settings may not be re-used&#39;.\n\nFrom apple’s documents.\n\nImportantIt is illegal to reuse a AVCapturePhotoSettings instance for multiple captures. Calling the capturePhoto(with:delegate:) method throws an exception (invalidArgumentException) if the settings object’s uniqueID value matches that of any previously used settings object.To reuse a specific combination of settings, use the init(from:) initializer to create a new, unique AVCapturePhotoSettings instance from an existing photo settings object.\n\nThe correct way to do it is to make a new AVCapturePhotoSettings object from copying your pre-made object:\n12AVCapturePhotoSettings *uniqueSetting = [AVCapturePhotoSettings photoSettingsFromPhotoSettings:self.outputSettings];[self.imageOutput capturePhotoWithSettings:uniqueSetting delegate:self];","dateCreated":"2018-10-16T20:15:54-07:00","dateModified":"2018-10-17T20:17:29-07:00","datePublished":"2018-10-16T20:15:54-07:00","description":"The error message when you reused an AVCapturePhotoSettings object is -[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] Settings may not be re-used&#39;.","headline":"AVCapturePhotoSettings Reuse Error","image":["xcode_error_icon.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2018/10/16/error-record-2/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2018/10/16/error-record-2/","keywords":"iOS, AVFoundation, Objc, Error","thumbnailUrl":"xcode_error_icon.png"}</script>
-    <meta name="description" content="The error message when you reused an AVCapturePhotoSettings object is -[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] Settings may not be re-used&amp;#39;.">
-<meta name="keywords" content="iOS,AVFoundation,Objc,Error">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.\n\nPasta example from https://www.hackingwithswift.com/articles/77/whats-new-in-swift-4-2\n1234567enum Pasta: CaseIterable &#123;\tcase cannelloni, fusilli, linguine, tagliatelle&#125;for pasta in Pasta.allCases &#123;\tprint(pasta)&#125;\nPrint out:\n1234cannellonifusillilinguinetagliatelle\nThen you can easily generate data for table view.\n12345678910111213141516171819202122232425262728293031323334enum Pasta: CaseIterable &#123;    case conchiglie, fusilli, linguine, tagliatelle        var name: String &#123;        switch self &#123;        case .conchiglie: return \"Conchiglie\"        case .fusilli: return \"Fusilli\"        case .linguine: return \"Linguine\"        case .tagliatelle: return \"Tagliatelle\"        &#125;    &#125;        var shape: String &#123;        switch self &#123;        case .conchiglie: return \"Shells\"        case .fusilli: return \"Twists\"        case .linguine: return \"Long and skinny\"        case .tagliatelle: return \"Long ribbons\"        &#125;    &#125;        var image: UIImage &#123;        switch self &#123;        case .conchiglie: return UIImage(named: \"conchiglie\")!        case .fusilli: return UIImage(named: \"fusilli\")!        case .linguine: return UIImage(named: \"linguine\")!        case .tagliatelle: return UIImage(named: \"tagliatelle\")!        &#125;    &#125;&#125;// Generate data for the table viewvar objectsForTableView: [Pasta] = Pasta.allcases...\n\n","dateCreated":"2019-02-06T23:02:34-08:00","dateModified":"2019-02-06T23:06:53-08:00","datePublished":"2019-02-06T23:02:34-08:00","description":"The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.","headline":"CaseIterable from Swift 4.2","image":["pasta-table.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/","keywords":"Swift, iOS","thumbnailUrl":"pasta-table.jpg"}</script>
+    <meta name="description" content="The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.">
+<meta name="keywords" content="Swift,iOS">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="AVCapturePhotoSettings Reuse Error">
-<meta property="og:url" content="https://jasonhan1990.github.io/2018/10/16/error-record-2/index.html">
+<meta property="og:title" content="CaseIterable from Swift 4.2">
+<meta property="og:url" content="https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/index.html">
 <meta property="og:site_name" content="JasonH&#39;s Blog">
-<meta property="og:description" content="The error message when you reused an AVCapturePhotoSettings object is -[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] Settings may not be re-used&amp;#39;.">
+<meta property="og:description" content="The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-10-18T03:17:29.785Z">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/pasta-table.jpg">
+<meta property="og:updated_time" content="2019-02-07T07:06:53.102Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="AVCapturePhotoSettings Reuse Error">
-<meta name="twitter:description" content="The error message when you reused an AVCapturePhotoSettings object is -[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] Settings may not be re-used&amp;#39;.">
+<meta name="twitter:title" content="CaseIterable from Swift 4.2">
+<meta name="twitter:description" content="The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.">
+<meta name="twitter:image" content="https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/pasta-table.jpg">
     
     
         
@@ -36,8 +38,8 @@
         <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
     
     
-        <meta property="og:image" content="https://jasonhan1990.github.ioxcode_error_icon.png"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioxcode_error_icon.png" />
+        <meta property="og:image" content="https://jasonhan1990.github.iopasta-table.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.iopasta-table.jpg" />
     
     
     
@@ -249,14 +251,14 @@
         <div class="post-header main-content-wrap text-center">
     
         <h1 class="post-title">
-            AVCapturePhotoSettings Reuse Error
+            CaseIterable from Swift 4.2
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2018-10-16T20:15:54-07:00">
+    <time datetime="2019-02-06T23:02:34-08:00">
 	
-		    Oct 16, 2018
+		    Feb 06, 2019
     	
     </time>
     
@@ -275,14 +277,16 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>The error message when you reused an AVCapturePhotoSettings object is <code>-[AVCapturePhotoOutput capturePhotoWithSettings:delegate:] Settings may not be re-used&#39;</code>.</p>
+            <p>The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.</p>
 <a id="more"></a>
-<p>From apple’s documents.</p>
-<blockquote>
-<h3 id="Important"><a href="#Important" class="headerlink" title="Important"></a>Important</h3><p>It is illegal to reuse a AVCapturePhotoSettings instance for multiple captures. Calling the capturePhoto(with:delegate:) method throws an exception (invalidArgumentException) if the settings object’s uniqueID value matches that of any previously used settings object.<br>To reuse a specific combination of settings, use the init(from:) initializer to create a new, unique AVCapturePhotoSettings instance from an existing photo settings object.</p>
-</blockquote>
-<p>The correct way to do it is to make a new AVCapturePhotoSettings object from copying your pre-made object:</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">AVCapturePhotoSettings</span> *uniqueSetting = [<span class="built_in">AVCapturePhotoSettings</span> photoSettingsFromPhotoSettings:<span class="keyword">self</span>.outputSettings];</span><br><span class="line">[<span class="keyword">self</span>.imageOutput capturePhotoWithSettings:uniqueSetting delegate:<span class="keyword">self</span>];</span><br></pre></td></tr></table></figure>
+<p>Pasta example from <a href="https://www.hackingwithswift.com/articles/77/whats-new-in-swift-4-2" target="_blank" rel="noopener">https://www.hackingwithswift.com/articles/77/whats-new-in-swift-4-2</a></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Pasta</span>: <span class="title">CaseIterable</span> </span>&#123;</span><br><span class="line">	<span class="keyword">case</span> cannelloni, fusilli, linguine, tagliatelle</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> pasta <span class="keyword">in</span> <span class="type">Pasta</span>.allCases &#123;</span><br><span class="line">	<span class="built_in">print</span>(pasta)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Print out:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cannelloni</span><br><span class="line">fusilli</span><br><span class="line">linguine</span><br><span class="line">tagliatelle</span><br></pre></td></tr></table></figure>
+<p>Then you can easily generate data for table view.</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Pasta</span>: <span class="title">CaseIterable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">case</span> conchiglie, fusilli, linguine, tagliatelle</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">switch</span> <span class="keyword">self</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> .conchiglie: <span class="keyword">return</span> <span class="string">"Conchiglie"</span></span><br><span class="line">        <span class="keyword">case</span> .fusilli: <span class="keyword">return</span> <span class="string">"Fusilli"</span></span><br><span class="line">        <span class="keyword">case</span> .linguine: <span class="keyword">return</span> <span class="string">"Linguine"</span></span><br><span class="line">        <span class="keyword">case</span> .tagliatelle: <span class="keyword">return</span> <span class="string">"Tagliatelle"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> shape: <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">switch</span> <span class="keyword">self</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> .conchiglie: <span class="keyword">return</span> <span class="string">"Shells"</span></span><br><span class="line">        <span class="keyword">case</span> .fusilli: <span class="keyword">return</span> <span class="string">"Twists"</span></span><br><span class="line">        <span class="keyword">case</span> .linguine: <span class="keyword">return</span> <span class="string">"Long and skinny"</span></span><br><span class="line">        <span class="keyword">case</span> .tagliatelle: <span class="keyword">return</span> <span class="string">"Long ribbons"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> image: <span class="type">UIImage</span> &#123;</span><br><span class="line">        <span class="keyword">switch</span> <span class="keyword">self</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> .conchiglie: <span class="keyword">return</span> <span class="type">UIImage</span>(named: <span class="string">"conchiglie"</span>)!</span><br><span class="line">        <span class="keyword">case</span> .fusilli: <span class="keyword">return</span> <span class="type">UIImage</span>(named: <span class="string">"fusilli"</span>)!</span><br><span class="line">        <span class="keyword">case</span> .linguine: <span class="keyword">return</span> <span class="type">UIImage</span>(named: <span class="string">"linguine"</span>)!</span><br><span class="line">        <span class="keyword">case</span> .tagliatelle: <span class="keyword">return</span> <span class="type">UIImage</span>(named: <span class="string">"tagliatelle"</span>)!</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate data for the table view</span></span><br><span class="line"><span class="keyword">var</span> objectsForTableView: [<span class="type">Pasta</span>] = <span class="type">Pasta</span>.allcases</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<div class="figure center" style="width:;"><a class="fancybox" href="pasta-table.jpg" title="" data-caption="" data-fancybox="default"><img class="fig-img" src="pasta-table.jpg" alt=""></a></div>
+
             
 
         </div>
@@ -294,7 +298,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVFoundation/">AVFoundation</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Error/">Error</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
 
             </div>
         
@@ -304,8 +308,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2019/02/06/swift-new-feature-1/" data-tooltip="CaseIterable from Swift 4.2" aria-label="PREVIOUS: CaseIterable from Swift 4.2">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -314,7 +317,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="NEXT: Blog moving notice">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2018/10/16/error-record-2/" data-tooltip="AVCapturePhotoSettings Reuse Error" aria-label="NEXT: AVCapturePhotoSettings Reuse Error">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -332,7 +335,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/10/16/error-record-2/" title="Share on Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/" title="Share on Facebook">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -340,7 +343,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/10/16/error-record-2/" title="Share on Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/" title="Share on Twitter">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -348,7 +351,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/10/16/error-record-2/" title="Share on Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/" title="Share on Weibo">
                     <i class="fab fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -356,7 +359,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/10/16/error-record-2/&amp;title=AVCapturePhotoSettings Reuse Error" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/&amp;title=CaseIterable from Swift 4.2" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
@@ -392,8 +395,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2019/02/06/swift-new-feature-1/" data-tooltip="CaseIterable from Swift 4.2" aria-label="PREVIOUS: CaseIterable from Swift 4.2">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -402,7 +404,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../09/17/blog-moving-notice/" data-tooltip="Blog moving notice" aria-label="NEXT: Blog moving notice">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../../2018/10/16/error-record-2/" data-tooltip="AVCapturePhotoSettings Reuse Error" aria-label="NEXT: AVCapturePhotoSettings Reuse Error">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -420,7 +422,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/10/16/error-record-2/" title="Share on Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/" title="Share on Facebook">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -428,7 +430,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/10/16/error-record-2/" title="Share on Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/" title="Share on Twitter">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -436,7 +438,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/10/16/error-record-2/" title="Share on Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/" title="Share on Weibo">
                     <i class="fab fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -444,7 +446,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/10/16/error-record-2/&amp;title=AVCapturePhotoSettings Reuse Error" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/&amp;title=CaseIterable from Swift 4.2" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
@@ -469,7 +471,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2018/10/16/error-record-2/">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/">
                     <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
                 </a>
             </li>
@@ -477,7 +479,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2018/10/16/error-record-2/">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/">
                     <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
                 </a>
             </li>
@@ -485,7 +487,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2018/10/16/error-record-2/">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/">
                     <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
                 </a>
             </li>
@@ -493,7 +495,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2018/10/16/error-record-2/&amp;title=AVCapturePhotoSettings Reuse Error">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/&amp;title=CaseIterable from Swift 4.2">
                     <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
                 </a>
             </li>
