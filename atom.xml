@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://jasonhan1990.github.io/"/>
-  <updated>2019-03-03T21:17:39.751Z</updated>
+  <updated>2019-03-03T22:02:53.972Z</updated>
   <id>https://jasonhan1990.github.io/</id>
   
   <author>
@@ -17,16 +17,26 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>objc-mem-management-01</title>
+    <title>unsafe_unretained vs. weak</title>
     <link href="https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/"/>
     <id>https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/</id>
     <published>2019-03-03T21:17:39.000Z</published>
-    <updated>2019-03-03T21:17:39.751Z</updated>
+    <updated>2019-03-03T22:02:53.972Z</updated>
+    
+    <content type="html"><![CDATA[<p>They are both representing the nonowning relationship.<br>But the diffrence is:<br><a id="more"></a></p><p>When the <code>unsafe_unretained</code> object is recycled by ARC, the property is still pointing to the object. If we are calling the property, the system will crash.<br>However, when the <code>weak</code> object is recycled by ARC, the property will be set to nil. If we are calling the property, of course nothing will happen, but the system won’t crash.<br>That is why <code>weak</code> is safer than <code>unsafe_unretained</code>.</p>]]></content>
     
     <summary type="html">
     
+      &lt;p&gt;They are both representing the nonowning relationship.&lt;br&gt;But the diffrence is:&lt;br&gt;
+    
     </summary>
     
+      <category term="iOS" scheme="https://jasonhan1990.github.io/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://jasonhan1990.github.io/tags/iOS/"/>
+    
+      <category term="Objective-C" scheme="https://jasonhan1990.github.io/tags/Objective-C/"/>
     
   </entry>
   
