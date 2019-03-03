@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Juncheng&#39;s Blog">
-    <title>Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family - Juncheng&#39;s Blog</title>
+    <title>objc-mem-management-01 - Juncheng&#39;s Blog</title>
     <meta name="author" content="Juncheng Han">
     
     
@@ -15,21 +15,18 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"I got this error because I mistyped the Link to link.\nSo two rules that Xcode determine a method is an init method:\n\nreturn instancetype or id\nthe method name should be a capital letter followed by init. \n\nFor example:\n1- (intancetype)initWithImage:(UIImage *)image;\n","dateCreated":"2016-11-03T15:37:06-07:00","dateModified":"2018-09-20T17:23:37-07:00","datePublished":"2016-11-03T15:37:06-07:00","description":"I got this error because I mistyped the Link to link.","headline":"Error: Cannot Assign To 'self' Outside Of A Method In The Init Family","image":["xcode_error_icon.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/11/03/error-record-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/11/03/error-record-1/","keywords":"iOS, Objc, Error","thumbnailUrl":"xcode_error_icon.png"}</script>
-    <meta name="description" content="I got this error because I mistyped the Link to link.">
-<meta name="keywords" content="iOS,Objc,Error">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"","dateCreated":"2019-03-03T13:17:39-08:00","dateModified":"2019-03-03T13:17:39-08:00","datePublished":"2019-03-03T13:17:39-08:00","description":"","headline":"objc-mem-management-01","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/"}</script>
+    <meta name="description" content="Juncheng Han">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family">
-<meta property="og:url" content="https://jasonhan1990.github.io/2016/11/03/error-record-1/index.html">
+<meta property="og:title" content="objc-mem-management-01">
+<meta property="og:url" content="https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/index.html">
 <meta property="og:site_name" content="Juncheng&#39;s Blog">
-<meta property="og:description" content="I got this error because I mistyped the Link to link.">
+<meta property="og:description" content="Juncheng Han">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="https://jasonhan1990.github.io/2016/11/03/error-record-1/e1-1.png">
-<meta property="og:updated_time" content="2018-09-21T00:23:37.317Z">
+<meta property="og:updated_time" content="2019-03-03T21:17:39.751Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family">
-<meta name="twitter:description" content="I got this error because I mistyped the Link to link.">
-<meta name="twitter:image" content="https://jasonhan1990.github.io/2016/11/03/error-record-1/e1-1.png">
+<meta name="twitter:title" content="objc-mem-management-01">
+<meta name="twitter:description" content="Juncheng Han">
     
     
         
@@ -37,9 +34,6 @@
     
         <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
     
-    
-        <meta property="og:image" content="https://jasonhan1990.github.ioxcode_error_icon.png"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioxcode_error_icon.png" />
     
     
     
@@ -70,7 +64,7 @@
             <!-- Define author's picture -->
 
 
-<header id="header" data-behavior="2">
+<header id="header" data-behavior="5">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a class="header-title-link" href="../../../../ ">Juncheng&#39;s Blog</a>
@@ -93,7 +87,7 @@
         
     
 
-<nav id="sidebar" data-behavior="2">
+<nav id="sidebar" data-behavior="5">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -214,7 +208,7 @@
 </nav>
 
             
-            <div id="main" data-behavior="2"
+            <div id="main" data-behavior="5"
                  class="
                         hasCoverMetaIn
                         ">
@@ -223,25 +217,19 @@
 <article class="post">
     
     
-        <div class="post-header main-content-wrap text-center">
+        <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family
+            objc-mem-management-01
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2016-11-03T15:37:06-07:00">
+    <time datetime="2019-03-03T13:17:39-08:00">
 	
-		    Nov 03, 2016
+		    Mar 03, 2019
     	
     </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="../../../../categories/iOS/">iOS</a>
-
-
     
 </div>
 
@@ -252,15 +240,7 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>I got this error because I mistyped the <strong>Link</strong> to <strong>link</strong>.<br><a id="more"></a><br><div class="figure center" style="width:;"><a class="fancybox" href="e1-1.png" title data-caption data-fancybox="default"><img class="fig-img" src="e1-1.png" alt></a></div></p>
-<p>So two rules that Xcode determine a method is an init method:</p>
-<ol>
-<li>return <code>instancetype</code> or <code>id</code></li>
-<li>the method name should be a capital letter followed by <code>init</code>. </li>
-</ol>
-<p>For example:</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (intancetype)initWithImage:(<span class="built_in">UIImage</span> *)image;</span><br></pre></td></tr></table></figure>
-
+            
             
 
         </div>
@@ -269,21 +249,13 @@
     
     <div id="post-footer" class="post-footer main-content-wrap">
         
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br>
-                
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Error/">Error</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
-
-            </div>
-        
         
             <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../08/create-thumbnail-for-video/" data-tooltip="Create Thumbnail For Video" aria-label="PREVIOUS: Create Thumbnail For Video">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -292,7 +264,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../10/31/gcd-note-2/" data-tooltip="GCD Note 2" aria-label="NEXT: GCD Note 2">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../02/06/swift-new-feature-1/" data-tooltip="CaseIterable from Swift 4.2" aria-label="NEXT: CaseIterable from Swift 4.2">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -310,7 +282,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2016/11/03/error-record-1/" title="Share on Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/" title="Share on Facebook">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -318,7 +290,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2016/11/03/error-record-1/" title="Share on Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/" title="Share on Twitter">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -326,7 +298,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2016/11/03/error-record-1/" title="Share on Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/" title="Share on Weibo">
                     <i class="fab fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -334,11 +306,13 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2016/11/03/error-record-1/&amp;title=Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/&amp;title=objc-mem-management-01" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
         
+        
+            
         
         <li class="post-action">
             
@@ -353,6 +327,8 @@
 
         
         
+            
+        
     </div>
 </article>
 
@@ -364,14 +340,13 @@
 
             </div>
             
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
                     <div class="post-actions-wrap">
     <nav>
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../08/create-thumbnail-for-video/" data-tooltip="Create Thumbnail For Video" aria-label="PREVIOUS: Create Thumbnail For Video">
+                    <a class="post-action-btn btn btn--disabled">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -380,7 +355,7 @@
             <li class="post-action">
                 
                     
-                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../10/31/gcd-note-2/" data-tooltip="GCD Note 2" aria-label="NEXT: GCD Note 2">
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../../02/06/swift-new-feature-1/" data-tooltip="CaseIterable from Swift 4.2" aria-label="NEXT: CaseIterable from Swift 4.2">
                 
                     <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -398,7 +373,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2016/11/03/error-record-1/" title="Share on Facebook">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/" title="Share on Facebook">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -406,7 +381,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2016/11/03/error-record-1/" title="Share on Twitter">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/" title="Share on Twitter">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -414,7 +389,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2016/11/03/error-record-1/" title="Share on Weibo">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/" title="Share on Weibo">
                     <i class="fab fa-weibo" aria-hidden="true"></i>
                 </a>
             </li>
@@ -422,11 +397,13 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2016/11/03/error-record-1/&amp;title=Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/&amp;title=objc-mem-management-01" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
         
+        
+            
         
         <li class="post-action">
             
@@ -440,14 +417,14 @@
 
 
                 </div>
-                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+                <div id="share-options-bar" class="share-options-bar" data-behavior="5">
     <i id="btn-close-shareoptions" class="fa fa-times"></i>
     <ul class="share-options">
         
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2016/11/03/error-record-1/">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/">
                     <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
                 </a>
             </li>
@@ -455,7 +432,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2016/11/03/error-record-1/">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/">
                     <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
                 </a>
             </li>
@@ -463,7 +440,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2016/11/03/error-record-1/">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/">
                     <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
                 </a>
             </li>
@@ -471,7 +448,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2016/11/03/error-record-1/&amp;title=Error: Cannot Assign To &#39;self&#39; Outside Of A Method In The Init Family">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/03/objc-mem-management-01/&amp;title=objc-mem-management-01">
                     <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
                 </a>
             </li>
@@ -528,6 +505,8 @@
 <script src="../../../../assets/js/thumbs.js"></script>
 <script src="../../../../assets/js/tranquilpeak.js"></script>
 <!--SCRIPTS END-->
+
+    
 
 
 
