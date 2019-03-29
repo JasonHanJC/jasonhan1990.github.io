@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Jason&#39;s Blog">
-    <title>My first chrome extension - Jason&#39;s Blog</title>
+    <title>My first chrome extension - College Data Scraper - Jason&#39;s Blog</title>
     <meta name="author" content="Juncheng Han">
     
     
@@ -15,11 +15,11 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"I wrote a chrome extension to scrape college admission data.\nRecently, I am working on a project about training a model to predict the college admission. Me and my teammate, we are searching for data from https://www.collegedata.com. Unfortunately, the website doesn’t offer data downloading. So I started to write a program to scrape the data.My first implementation was using Cheerio (https://github.com/cheeriojs/cheerio), a NodeJS framework that is good at parsing and searching HTML nodes.However, I need to hand typing a bunch of variables as inputs to my program. And for my teammate, it was not convenient for him to use. He needed to install NodeJS and know some basic knowledge of how NodeJS works.\nMy second implementation was to create a chrome extension and use jQuery to scrape the data. Then, I packed the extension and sent it to my teammate to install and use it.\nSince it is not a commercial extension. I am keeping things simple.\nFiles\n\nmanifest.json: All the configuration of your extension.\ncontent.js: My code that creates UI and scrape the data.\nFileSaver.js: Use it to save the data as a file. (https://github.com/eligrey/FileSaver.js/)\n\nmanifest.json12345678910111213141516&#123;    \"manifest_version\": 2,    \"name\": \"Collegedata-Srcaper\",    \"version\": \"0.1\",    \"content_scripts\": [        &#123;          \"matches\": [            \"https://www.collegedata.com/*\"          ],          \"js\": [\"jquery-3.3.1.min.js\",\"FileSaver.js\", \"content.js\"]        &#125;    ],    \"browser_action\": &#123;        \"default_icon\": \"icon.png\"    &#125;&#125;\nFor “js” section, the order is important. Chrome loads them sequentially. So, the libs need to load first.\nInstall and pack your extensionGo to chrome -&gt; extension. Toggle the developer mode. Then load unpacked extention.\nScreenshotsAfter installing the extension, in the https://www.collegedata.com website, a floating bar appears on the top left corner.\n\nThe extension works when there are data on the page. Otherwise, it just alerts you “No data found”.\nSo, go the admission tracking page, and type in the university and years that you want to look at. Here, I typed in Stanford, and year from 2010 to 2020.\n\nOnce the data are retrieved from server. Click “Download” button. Then, save the data.csv file to your desktop.\n\nOpen with Office Excel.\n\nBravo!!!","dateCreated":"2019-03-28T23:08:46-07:00","dateModified":"2019-03-29T00:39:06-07:00","datePublished":"2019-03-28T23:08:46-07:00","description":"I wrote a chrome extension to scrape college admission data.","headline":"My first chrome extension","image":["scraper.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/","keywords":"javascript, chrome extension","thumbnailUrl":"scraper.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"I wrote a chrome extension to scrape college admission data.\nRecently, I am working on a project about training a model to predict the college admission. Me and my teammate, we are searching for data from https://www.collegedata.com. Unfortunately, the website doesn’t offer data downloading. So I started to write a program to scrape the data.My first implementation was using Cheerio (https://github.com/cheeriojs/cheerio), a NodeJS framework that is good at parsing and searching HTML nodes.However, I need to hand typing a bunch of variables as inputs to my program. And for my teammate, it was not convenient for him to use. He needed to install NodeJS and know some basic knowledge of how NodeJS works.\nMy second implementation was to create a chrome extension and use jQuery to scrape the data. Then, I packed the extension and sent it to my teammate to install and use it.\nSince it is not a commercial extension. I am keeping things simple.\nFiles\n\nmanifest.json: All the configuration of your extension.\ncontent.js: My code that creates UI and scrape the data.\nFileSaver.js: Use it to save the data as a file. (https://github.com/eligrey/FileSaver.js/)\n\nmanifest.json12345678910111213141516&#123;    \"manifest_version\": 2,    \"name\": \"Collegedata-Srcaper\",    \"version\": \"0.1\",    \"content_scripts\": [        &#123;          \"matches\": [            \"https://www.collegedata.com/*\"          ],          \"js\": [\"jquery-3.3.1.min.js\",\"FileSaver.js\", \"content.js\"]        &#125;    ],    \"browser_action\": &#123;        \"default_icon\": \"icon.png\"    &#125;&#125;\nFor “js” section, the order is important. Chrome loads them sequentially. So, the libs need to load first.\nInstall and pack your extensionGo to chrome -&gt; extension. Toggle the developer mode. Then load unpacked extention.\nScreenshotsAfter installing the extension, in the https://www.collegedata.com website, a floating bar appears on the top left corner.\n\nThe extension works when there are data on the page. Otherwise, it just alerts you “No data found”.\nSo, go the admission tracking page, and type in the university and years that you want to look at. Here, I typed in Stanford, and year from 2010 to 2020.\n\nOnce the data are retrieved from server. Click “Download” button. Then, save the data.csv file to your desktop.\n\nOpen with Office Excel.\n\nBravo!!!","dateCreated":"2019-03-28T23:08:46-07:00","dateModified":"2019-03-29T00:48:34-07:00","datePublished":"2019-03-28T23:08:46-07:00","description":"I wrote a chrome extension to scrape college admission data.","headline":"My first chrome extension - College Data Scraper","image":["icon.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/","keywords":"javascript, chrome extension","thumbnailUrl":"icon.jpg"}</script>
     <meta name="description" content="I wrote a chrome extension to scrape college admission data.">
 <meta name="keywords" content="javascript,chrome extension">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="My first chrome extension">
+<meta property="og:title" content="My first chrome extension - College Data Scraper">
 <meta property="og:url" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="I wrote a chrome extension to scrape college admission data.">
@@ -31,9 +31,9 @@
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.50.13%20PM.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-29%20at%2012.08.25%20AM.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-29%20at%2012.30.33%20AM.png">
-<meta property="og:updated_time" content="2019-03-29T07:39:06.865Z">
+<meta property="og:updated_time" content="2019-03-29T07:48:34.062Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="My first chrome extension">
+<meta name="twitter:title" content="My first chrome extension - College Data Scraper">
 <meta name="twitter:description" content="I wrote a chrome extension to scrape college admission data.">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.39.39%20PM.png">
     
@@ -44,8 +44,8 @@
         <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
     
     
-        <meta property="og:image" content="https://jasonhan1990.github.ioscraper.png"/>
-        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioscraper.png" />
+        <meta property="og:image" content="https://jasonhan1990.github.ioicon.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioicon.jpg" />
     
     
     
@@ -232,7 +232,7 @@
         <div class="post-header main-content-wrap text-center">
     
         <h1 class="post-title">
-            My first chrome extension
+            My first chrome extension - College Data Scraper
         </h1>
     
     
@@ -353,7 +353,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension - College Data Scraper" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
@@ -444,7 +444,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension" title="Share on QQ">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension - College Data Scraper" title="Share on QQ">
                     <i class="fab fa-qq" aria-hidden="true"></i>
                 </a>
             </li>
@@ -495,7 +495,7 @@
             
             
             <li class="share-option">
-                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension - College Data Scraper">
                     <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
                 </a>
             </li>
