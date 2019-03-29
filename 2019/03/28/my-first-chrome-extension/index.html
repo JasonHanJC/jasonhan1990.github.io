@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Jason&#39;s Blog">
+    <title>My first chrome extension - Jason&#39;s Blog</title>
+    <meta name="author" content="Juncheng Han">
+    
+    
+        <link rel="icon" href="/assets/images/favicn.png">
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"I wrote a chrome extension to scrape college admission data.\nRecently, I am working on a project about training a model to predict the college admission. Me and my teammate, we are searching for data from https://www.collegedata.com. Unfortunately, the website doesn’t offer data downloading. So I started to write a program to scrape the data.My first implementation was using Cheerio (https://github.com/cheeriojs/cheerio), a NodeJS framework that is good at parsing and searching HTML nodes.However, I need to hand typing a bunch of variables as inputs to my program. And for my teammate, it was not convenient for him to use. He needed to install NodeJS and know some basic knowledge of how NodeJS works.Then, my second implementation was to create a chrome extension and use jQuery to scrape the data.\nSince it is not a commercial extension. I am keeping things simple.\nFiles\n\nmanifest.json: All the configuration of your extension.\ncontent.js: My code that creates UI and scrape the data.\nFileSaver.js: Use it to save the data as a file. (https://github.com/eligrey/FileSaver.js/)\n\nmanifest.json12345678910111213141516&#123;    \"manifest_version\": 2,    \"name\": \"Collegedata-Srcaper\",    \"version\": \"0.1\",    \"content_scripts\": [        &#123;          \"matches\": [            \"https://www.collegedata.com/*\"          ],          \"js\": [\"jquery-3.3.1.min.js\",\"FileSaver.js\", \"content.js\"]        &#125;    ],    \"browser_action\": &#123;        \"default_icon\": \"icon.png\"    &#125;&#125;\nFor “js” section, the order is important. Chrome loads them sequentially. So, the libs need to load first.\nInstall and pack your extensionGo to chrome -&gt; extension. Toggle the developer mode. Then load unpacked extention.\nScreenshotsAfter installing the extension, in the https://www.collegedata.com website, a floating bar appears on the top left corner.\n\nThe extension works when there are data on the page. Otherwise, it just alerts you “No data found”.\nSo, go the admission tracking page, and type in the university and years that you want to look at. Here, I typed in Stanford, and year from 2010 to 2020.\n\nOnce the data are retrieved from server. Click “Download” button.Then, save the data.csv file to your desktop.\n\nOpen with Office Excel.\n\nBravo","dateCreated":"2019-03-28T23:08:46-07:00","dateModified":"2019-03-29T00:23:04-07:00","datePublished":"2019-03-28T23:08:46-07:00","description":"I wrote a chrome extension to scrape college admission data.","headline":"My first chrome extension","image":["scraper.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/","keywords":"javascript, chrome extension","thumbnailUrl":"scraper.png"}</script>
+    <meta name="description" content="I wrote a chrome extension to scrape college admission data.">
+<meta name="keywords" content="javascript,chrome extension">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="My first chrome extension">
+<meta property="og:url" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/index.html">
+<meta property="og:site_name" content="Jason&#39;s Blog">
+<meta property="og:description" content="I wrote a chrome extension to scrape college admission data.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.39.39%20PM.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.52.38%20PM.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.52.57%20PM.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.49.30%20PM.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.50.13%20PM.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-29%20at%2012.08.25%20AM.png">
+<meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-29%20at%2012.08.44%20AM.png">
+<meta property="og:updated_time" content="2019-03-29T07:23:04.075Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="My first chrome extension">
+<meta name="twitter:description" content="I wrote a chrome extension to scrape college admission data.">
+<meta name="twitter:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.39.39%20PM.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.io../../../../assets/images/avatar.jpg"/>
+    
+    
+        <meta property="og:image" content="https://jasonhan1990.github.ioscraper.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://jasonhan1990.github.ioscraper.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="../../../../assets/css/all.css">
+    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-126130510-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="2">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+    </div>
+    
+        
+            <a class="header-right-icon " href="#about">
+        
+        
+            <i class="avatar.jpg fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="2">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a href="../../../../#about">
+                    <img class="sidebar-profile-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture">
+                </a>
+                <h4 class="sidebar-profile-name">Juncheng Han</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="../../../../ " title="Home 主页">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home 主页</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="../../../../projects" title="Projects 项目">
+                    
+                        <i class="sidebar-button-icon fa fa-th" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Projects 项目</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="../../../../all-categories" title="Categories 分类">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories 分类</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="../../../../all-tags" title="Tags 标签">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags 标签</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="../../../../all-archives" title="Archives 归档">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives 归档</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                    
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn 领英</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                    
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail 邮箱</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                    
+                        <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Résumé 简历</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="../../../../atom.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="2"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            My first chrome extension
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-03-28T23:08:46-07:00">
+	
+		    Mar 28, 2019
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="../../../../categories/Web/">Web</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>I wrote a chrome extension to scrape college admission data.<br><a id="more"></a></p>
+<p>Recently, I am working on a project about training a model to predict the college admission. Me and my teammate, we are searching for data from <a href="https://www.collegedata.com" target="_blank" rel="noopener">https://www.collegedata.com</a>. Unfortunately, the website doesn’t offer data downloading. So I started to write a program to scrape the data.<br>My first implementation was using Cheerio (<a href="https://github.com/cheeriojs/cheerio)" target="_blank" rel="noopener">https://github.com/cheeriojs/cheerio)</a>, a NodeJS framework that is good at parsing and searching HTML nodes.<br>However, I need to hand typing a bunch of variables as inputs to my program. And for my teammate, it was not convenient for him to use. He needed to install NodeJS and know some basic knowledge of how NodeJS works.<br>Then, my second implementation was to create a chrome extension and use jQuery to scrape the data.</p>
+<p>Since it is not a commercial extension. I am keeping things simple.</p>
+<h3 id="Files"><a href="#Files" class="headerlink" title="Files"></a>Files</h3><div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-28%20at%2011.39.39%20PM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-28%20at%2011.39.39%20PM.png" alt></a></div>
+<ul>
+<li>manifest.json: All the configuration of your extension.</li>
+<li>content.js: My code that creates UI and scrape the data.</li>
+<li>FileSaver.js: Use it to save the data as a file. (<a href="https://github.com/eligrey/FileSaver.js/" target="_blank" rel="noopener">https://github.com/eligrey/FileSaver.js/</a>)</li>
+</ul>
+<h4 id="manifest-json"><a href="#manifest-json" class="headerlink" title="manifest.json"></a>manifest.json</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"manifest_version"</span>: <span class="number">2</span>,</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"Collegedata-Srcaper"</span>,</span><br><span class="line">    <span class="attr">"version"</span>: <span class="string">"0.1"</span>,</span><br><span class="line">    <span class="attr">"content_scripts"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"matches"</span>: [</span><br><span class="line">            <span class="string">"https://www.collegedata.com/*"</span></span><br><span class="line">          ],</span><br><span class="line">          <span class="attr">"js"</span>: [<span class="string">"jquery-3.3.1.min.js"</span>,<span class="string">"FileSaver.js"</span>, <span class="string">"content.js"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"browser_action"</span>: &#123;</span><br><span class="line">        <span class="attr">"default_icon"</span>: <span class="string">"icon.png"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>For “js” section, the order is important. Chrome loads them sequentially. So, the libs need to load first.</p>
+<h3 id="Install-and-pack-your-extension"><a href="#Install-and-pack-your-extension" class="headerlink" title="Install and pack your extension"></a>Install and pack your extension</h3><p>Go to chrome -&gt; extension. Toggle the developer mode. Then load unpacked extention.<br><div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-28%20at%2011.52.38%20PM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-28%20at%2011.52.38%20PM.png" alt></a></div><br><div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-28%20at%2011.52.57%20PM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-28%20at%2011.52.57%20PM.png" alt></a></div></p>
+<h3 id="Screenshots"><a href="#Screenshots" class="headerlink" title="Screenshots"></a>Screenshots</h3><p>After installing the extension, in the <a href="https://www.collegedata.com" target="_blank" rel="noopener">https://www.collegedata.com</a> website, a floating bar appears on the top left corner.</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-28%20at%2011.49.30%20PM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-28%20at%2011.49.30%20PM.png" alt></a></div>
+<p>The extension works when there are data on the page. Otherwise, it just alerts you “No data found”.</p>
+<p>So, go the admission tracking page, and type in the university and years that you want to look at. Here, I typed in Stanford, and year from 2010 to 2020.</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-28%20at%2011.50.13%20PM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-28%20at%2011.50.13%20PM.png" alt></a></div>
+<p>Once the data are retrieved from server. Click “Download” button.<br>Then, save the data.csv file to your desktop.</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-29%20at%2012.08.25%20AM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-29%20at%2012.08.25%20AM.png" alt></a></div>
+<p>Open with Office Excel.</p>
+<div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-29%20at%2012.08.44%20AM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-29%20at%2012.08.44%20AM.png" alt></a></div>
+<h3 id="Bravo"><a href="#Bravo" class="headerlink" title="Bravo"></a>Bravo</h3>
+            
+
+        </div>
+    </div>
+    <!-- projects grid -->
+    
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="../../../../tags/chrome-extension/">chrome extension</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/javascript/">javascript</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../20/ios-ui-dev-001/" data-tooltip="Correctly using custom fonts in XCode" aria-label="NEXT: Correctly using custom fonts in XCode">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2019 Juncheng Han. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="2">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../20/ios-ui-dev-001/" data-tooltip="Correctly using custom fonts in XCode" aria-label="NEXT: Correctly using custom fonts in XCode">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="Share this post">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/" title="Share on Facebook">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/" title="Share on Twitter">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/" title="Share on Weibo">
+                    <i class="fab fa-weibo" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension" title="Share on QQ">
+                    <i class="fab fa-qq" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="2">
+    <i id="btn-close-shareoptions" class="fa fa-times"></i>
+    <ul class="share-options">
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/">
+                    <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/">
+                    <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://service.weibo.com/share/share.php?&amp;title=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/">
+                    <i class="fab fa-weibo" aria-hidden="true"></i><span>Share on Weibo</span>
+                </a>
+            </li>
+        
+            
+            
+            <li class="share-option">
+                <a class="share-option-btn" target="new" href="http://connect.qq.com/widget/shareqq/index.html?url=https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/&amp;title=My first chrome extension">
+                    <i class="fab fa-qq" aria-hidden="true"></i><span>Share on QQ</span>
+                </a>
+            </li>
+        
+    </ul>
+</div>
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture">
+        
+            <h4 id="about-card-name">Juncheng Han</h4>
+        
+            <div id="about-card-bio"><p>Software Engineer in San Francisco Bay Area</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>iOS and NodeJS Dev</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Sunnyvale, CA
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+<script src="../../../../assets/js/jquery.js"></script>
+<script src="../../../../assets/js/jquery.fancybox.js"></script>
+<script src="../../../../assets/js/thumbs.js"></script>
+<script src="../../../../assets/js/tranquilpeak.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+    </body>
+</html>

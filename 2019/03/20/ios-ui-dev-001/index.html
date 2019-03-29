@@ -263,7 +263,7 @@
 <h3 id="Step-4"><a href="#Step-4" class="headerlink" title="Step 4:"></a>Step 4:</h3><p><strong>Check the fonts names</strong><br>The font file downloaded from internet might be differ from the font name itself. You can check the font name with following codes:<br><strong>Objective-C</strong></p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="built_in">NSString</span> * fontFamilyName <span class="keyword">in</span> <span class="built_in">UIFont</span>.familyNames) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, fontFamilyName);</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSString</span> * fontName <span class="keyword">in</span> [<span class="built_in">UIFont</span> fontNamesForFamilyName:fontFamilyName]) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"|-%@"</span>, fontName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-20%20at%203.21.37%20PM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-20%20at%203.21.37%20PM.png" alt></a></div>
-<p><strong>Swift</strong><br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> family <span class="keyword">in</span> <span class="type">UIFont</span>.familyNames.sorted() &#123;</span><br><span class="line">    <span class="keyword">let</span> names = <span class="type">UIFont</span>.fontNames(forFamilyName: family)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Family: \(family) Font names: \(names)"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>Swift</strong><br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> family <span class="keyword">in</span> <span class="type">UIFont</span>.familyNames.sorted() &#123;</span><br><span class="line">    <span class="keyword">let</span> names = <span class="type">UIFont</span>.fontNames(forFamilyName: family)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Family: <span class="subst">\(family)</span> Font names: <span class="subst">\(names)</span>"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="Step-5"><a href="#Step-5" class="headerlink" title="Step 5:"></a>Step 5:</h3><p>Finally, use your custom fonts.</p>
 
             
@@ -287,7 +287,8 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../28/my-first-chrome-extension/" data-tooltip="My first chrome extension" aria-label="PREVIOUS: My first chrome extension">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
@@ -378,7 +379,8 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled">
+                    
+                    <a class="post-action-btn btn btn--default tooltip--top" href="../../28/my-first-chrome-extension/" data-tooltip="My first chrome extension" aria-label="PREVIOUS: My first chrome extension">
                 
                     <i class="fa fa-angle-left" aria-hidden="true"></i>
                     <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
