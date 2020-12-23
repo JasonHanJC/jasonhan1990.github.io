@@ -15,9 +15,9 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"There are several steps needed before you can successfully use your custom fonts in your iOS app.\nStep 1:Drag your fonts into XCode project, and make sure each of them is included in the target\nStep 2:Double check that your fonts are in the Resource BundleSelect your target -&gt; Build Phases -&gt; Copy Bundle Resources\nStep 3:Add your fonts to application plist\nStep 4:Check the fonts namesThe font file downloaded from internet might be differ from the font name itself. You can check the font name with following codes:Objective-C\n123456for (NSString * fontFamilyName in UIFont.familyNames) &#123;    NSLog(@\"%@\", fontFamilyName);    for (NSString * fontName in [UIFont fontNamesForFamilyName:fontFamilyName]) &#123;        NSLog(@\"|-%@\", fontName);    &#125;&#125;\n\nSwift1234for family in UIFont.familyNames.sorted() &#123;    let names = UIFont.fontNames(forFamilyName: family)    print(\"Family: \\(family) Font names: \\(names)\")&#125;\nStep 5:Finally, use your custom fonts.\n","dateCreated":"2019-03-20T15:27:42-07:00","dateModified":"2019-03-20T15:47:31-07:00","datePublished":"2019-03-20T15:27:42-07:00","description":"There are several steps needed before you can successfully use your custom fonts in your iOS app.","headline":"Correctly using custom fonts in XCode","image":["UI-dev.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/03/20/ios-ui-dev-001/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/03/20/ios-ui-dev-001/","keywords":"iOS, Swift, Objective-C, UIFont, UI Development","thumbnailUrl":"UI-dev.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"There are several steps needed before you can successfully use your custom fonts in your iOS app.\nStep 1:Drag your fonts into XCode project, and make sure each of them is included in the target\nStep 2:Double check that your fonts are in the Resource BundleSelect your target -&gt; Build Phases -&gt; Copy Bundle Resources\nStep 3:Add your fonts to application plist\nStep 4:Check the fonts namesThe font file downloaded from internet might be differ from the font name itself. You can check the font name with following codes:Objective-C\n123456for (NSString * fontFamilyName in UIFont.familyNames) &#123;    NSLog(@\"%@\", fontFamilyName);    for (NSString * fontName in [UIFont fontNamesForFamilyName:fontFamilyName]) &#123;        NSLog(@\"|-%@\", fontName);    &#125;&#125;\n\nSwift1234for family in UIFont.familyNames.sorted() &#123;    let names = UIFont.fontNames(forFamilyName: family)    print(\"Family: \\(family) Font names: \\(names)\")&#125;\nStep 5:Finally, use your custom fonts.\n","dateCreated":"2019-03-20T15:27:42-07:00","dateModified":"2019-03-20T15:47:31-07:00","datePublished":"2019-03-20T15:27:42-07:00","description":"There are several steps needed before you can successfully use your custom fonts in your iOS app.","headline":"Correctly using custom fonts in XCode","image":["UI-dev.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/03/20/ios-ui-dev-001/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/03/20/ios-ui-dev-001/","keywords":"Swift, iOS, Objective-C, UIFont, UI Development","thumbnailUrl":"UI-dev.png"}</script>
     <meta name="description" content="There are several steps needed before you can successfully use your custom fonts in your iOS app.">
-<meta name="keywords" content="iOS,Swift,Objective-C,UIFont,UI Development">
+<meta name="keywords" content="Swift,iOS,Objective-C,UIFont,UI Development">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Correctly using custom fonts in XCode">
 <meta property="og:url" content="https://jasonhan1990.github.io/2019/03/20/ios-ui-dev-001/index.html">
@@ -81,7 +81,8 @@
     </div>
     
         
-            <a class="header-right-icon " href="#about">
+            <a  class="header-right-icon "
+                href="#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -102,7 +103,7 @@
         
             <div class="sidebar-profile">
                 <a href="../../../../#about">
-                    <img class="sidebar-profile-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture">
+                    <img class="sidebar-profile-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
                 </a>
                 <h4 class="sidebar-profile-name">Juncheng Han</h4>
                 
@@ -116,7 +117,11 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="../../../../ " title="Home 主页">
+                        <a  class="sidebar-button-link "
+                             href="../../../../ "
+                            
+                            title="Home 主页"
+                        >
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home 主页</span>
@@ -125,7 +130,11 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="../../../../projects" title="Projects 项目">
+                        <a  class="sidebar-button-link "
+                             href="../../../../projects"
+                            
+                            title="Projects 项目"
+                        >
                     
                         <i class="sidebar-button-icon fa fa-th" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Projects 项目</span>
@@ -134,7 +143,11 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="../../../../all-categories" title="Categories 分类">
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-categories"
+                            
+                            title="Categories 分类"
+                        >
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Categories 分类</span>
@@ -143,7 +156,11 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="../../../../all-tags" title="Tags 标签">
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-tags"
+                            
+                            title="Tags 标签"
+                        >
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Tags 标签</span>
@@ -152,7 +169,11 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="../../../../all-archives" title="Archives 归档">
+                        <a  class="sidebar-button-link "
+                             href="../../../../all-archives"
+                            
+                            title="Archives 归档"
+                        >
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Archives 归档</span>
@@ -165,7 +186,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -174,7 +195,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -183,7 +204,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -192,7 +213,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -205,7 +226,11 @@
             
                 <li class="sidebar-button">
                     
-                        <a class="sidebar-button-link " href="../../../../atom.xml" title="RSS">
+                        <a  class="sidebar-button-link "
+                             href="../../../../atom.xml"
+                            
+                            title="RSS"
+                        >
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -263,7 +288,7 @@
 <h3 id="Step-4"><a href="#Step-4" class="headerlink" title="Step 4:"></a>Step 4:</h3><p><strong>Check the fonts names</strong><br>The font file downloaded from internet might be differ from the font name itself. You can check the font name with following codes:<br><strong>Objective-C</strong></p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="built_in">NSString</span> * fontFamilyName <span class="keyword">in</span> <span class="built_in">UIFont</span>.familyNames) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, fontFamilyName);</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSString</span> * fontName <span class="keyword">in</span> [<span class="built_in">UIFont</span> fontNamesForFamilyName:fontFamilyName]) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"|-%@"</span>, fontName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <div class="figure center" style="width:;"><a class="fancybox" href="Screen%20Shot%202019-03-20%20at%203.21.37%20PM.png" title data-caption data-fancybox="default"><img class="fig-img" src="Screen%20Shot%202019-03-20%20at%203.21.37%20PM.png" alt></a></div>
-<p><strong>Swift</strong><br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> family <span class="keyword">in</span> <span class="type">UIFont</span>.familyNames.sorted() &#123;</span><br><span class="line">    <span class="keyword">let</span> names = <span class="type">UIFont</span>.fontNames(forFamilyName: family)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Family: \(family) Font names: \(names)"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>Swift</strong><br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> family <span class="keyword">in</span> <span class="type">UIFont</span>.familyNames.sorted() &#123;</span><br><span class="line">    <span class="keyword">let</span> names = <span class="type">UIFont</span>.fontNames(forFamilyName: family)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Family: <span class="subst">\(family)</span> Font names: <span class="subst">\(names)</span>"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="Step-5"><a href="#Step-5" class="headerlink" title="Step 5:"></a>Step 5:</h3><p>Finally, use your custom fonts.</p>
 
             
@@ -275,7 +300,7 @@
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
-                <span class="text-color-light text-small">TAGGED IN</span><br>
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
     <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objective-C/">Objective-C</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/UI-Development/">UI Development</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/UIFont/">UIFont</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
 
@@ -367,7 +392,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2019 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -505,7 +530,7 @@
             <i class="fa fa-times"></i>
         </div>
         
-            <img id="about-card-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture">
+            <img id="about-card-picture" src="../../../../assets/images/avatar.jpg" alt="Author&#39;s picture"/>
         
             <h4 id="about-card-name">Juncheng Han</h4>
         
@@ -515,7 +540,7 @@
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
-                <br>
+                <br/>
                 <p>iOS and NodeJS Dev</p>
 
             </div>
@@ -523,7 +548,7 @@
         
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
-                <br>
+                <br/>
                 Sunnyvale, CA
             </div>
         
