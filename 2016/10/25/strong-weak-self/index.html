@@ -15,24 +15,27 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.So, a retain cycle usually occurs when an object A has a strong reference to Object B, and Object B also has a strong reference to Object A. Under this situation, the retainCount for both objects can not be 0, so the memory for these two objects won’t be released. This is the memory leak. The retain cycle could happen between multiple objects as long as their references between each other form a cycle.Retain cycle 1Also, an object can have a reference of itself which will cause retain cycle too. The most common situation is that an object owns a block, and in the block, we call any of this object’s methods or properties. Then the block has a reference to this object itself, which cause a retain cycle. Notice that blocks maintain strong references to any captured objects, including self, because they don’t want data be destroyed by ARC before themselves getting executed.Retain cycle 2\nExample 1:I have an object called Car. Car has a block called drive.\n12345678// car.h#import &lt;Foundation/Foundation.h&gt;typedef void(^Drive)();@interface Car : NSObject@property (nonatomic, copy) NSString *miles;@property (nonatomic, copy) Drive drive;@end\nIn the viewController.\n12345678910111213141516171819202122#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    car.drive = ^&#123;        NSLog(@\"Car drived %@\", car.miles);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nLeak! Here, the car has a strong reference to the drive block, and in the block, the block has a strong reference to the car since we called car.miles. This made the car has a reference to itself.\nUsing Instruments to detect the leak. Click the red cross. Malloc 48 Bytes means the system allocate 48 Bytes of memory to the block.\n\nOpen Cycles &amp; Roots. You can see the cycle.\nno ivar: Instruments can't find the variable name that allocated the memory so you get the [no ivar] message.\nChange the Example 1 to Example 2.\nExample 2:I pass a parameter into the block. Leak?\n12345678910111213141516171819202122#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    car.drive = ^(NSString *miles)&#123;        NSLog(@\"Car drived %@\", miles);    &#125;;    car.drive(car.miles);    NSLog(@\"return\");&#125;@end\nNo Leak. Checking the leak with instruments:\n\nSince I pass the car.miles into the block as a parameter, and the block won’t retain the parameter, there will be no retain cycle.\nWEAKSELF AND STRONGSELFweakSelfHow to create a weakSelf? There are two ways.\n12__weak __typeof(self) weakSelf = self; // Write this code every time before you use weakself.\n12#define WEAKSELF typeof(self) __ weak weakSelf = self  // Or create a macro in header file, then you can use WEAKSELF everywhere.\nThe reason we use weakSelf in a block is that with weak property, the block won’t retain the object in the block. Then we break the cycle. For example 1, we can use weakself to solve the retain cycle problem.\n1234567891011121314151617181920212223#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        NSLog(@\"Car drived %@\", weakCar.miles);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nstrongSelf1__strong __typeof(weakSelf) strongSelf = weakSelf;\n1#define STRONGSELF typeof(weakSelf) __strong strongSelf = weakSelf\nSince we use weakSelf in the block to prevent the retain cycle problem, there is a potential problem that the object could be released before the block has been executed. \nexample 3:123456789101112131415161718192021222324#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^&#123;            NSLog(@\"Car drived %@\", weakCar.miles);        &#125;);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nI add a delay before executing the NSlog(). Then the output is:... 15:28:20.875923 BlockTest[7630:4429580] return\n... 15:28:23.065725 BlockTest[7630:4429580] Car drived (null)\nWhat is happening here? The dispatch_after() function submits the block (which contains NSLog()) to the given queue (Here is the main queue) at the time specified by the when (Here is after 2 sec) parameter. Think the block as a task. The dispatch_after() asynchronously add the task to the main queue after two sec when you execute the study block. Since the study block has a weak reference to the car, after the study block has been execute (car.drive() is called), the weakCar is released by ARC, then the weak object will be set as nil. However, the dispatch block is still not executed. That is why we got null in the output.\nSo, we add strongSelf in the block which prevent the object will not be released inside the block. After the block is executed, strongSelf then release.\n1234567891011121314151617181920212223242526#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        __strong __typeof(weakCar) strongCar = weakCar;        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^&#123;            NSLog(@\"Car drived %@\", strongCar.miles);        &#125;);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end","dateCreated":"2016-10-25T19:51:16-07:00","dateModified":"2018-09-20T17:20:19-07:00","datePublished":"2016-10-25T19:51:16-07:00","description":"Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.","headline":"Why strongSelf and weakSelf?","image":["sws.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/10/25/strong-weak-self/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/10/25/strong-weak-self/","keywords":"iOS Animation, Objc, Memory Leak, Retain Cycle","thumbnailUrl":"sws.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.So, a retain cycle usually occurs when an object A has a strong reference to Object B, and Object B also has a strong reference to Object A. Under this situation, the retainCount for both objects can not be 0, so the memory for these two objects won’t be released. This is the memory leak. The retain cycle could happen between multiple objects as long as their references between each other form a cycle.Retain cycle 1Also, an object can have a reference of itself which will cause retain cycle too. The most common situation is that an object owns a block, and in the block, we call any of this object’s methods or properties. Then the block has a reference to this object itself, which cause a retain cycle. Notice that blocks maintain strong references to any captured objects, including self, because they don’t want data be destroyed by ARC before themselves getting executed.Retain cycle 2\nExample 1:I have an object called Car. Car has a block called drive.\n12345678// car.h#import &lt;Foundation/Foundation.h&gt;typedef void(^Drive)();@interface Car : NSObject@property (nonatomic, copy) NSString *miles;@property (nonatomic, copy) Drive drive;@end\nIn the viewController.\n12345678910111213141516171819202122#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    car.drive = ^&#123;        NSLog(@\"Car drived %@\", car.miles);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nLeak! Here, the car has a strong reference to the drive block, and in the block, the block has a strong reference to the car since we called car.miles. This made the car has a reference to itself.\nUsing Instruments to detect the leak. Click the red cross. Malloc 48 Bytes means the system allocate 48 Bytes of memory to the block.\n\nOpen Cycles &amp; Roots. You can see the cycle.\nno ivar: Instruments can't find the variable name that allocated the memory so you get the [no ivar] message.\nChange the Example 1 to Example 2.\nExample 2:I pass a parameter into the block. Leak?\n12345678910111213141516171819202122#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    car.drive = ^(NSString *miles)&#123;        NSLog(@\"Car drived %@\", miles);    &#125;;    car.drive(car.miles);    NSLog(@\"return\");&#125;@end\nNo Leak. Checking the leak with instruments:\n\nSince I pass the car.miles into the block as a parameter, and the block won’t retain the parameter, there will be no retain cycle.\nWEAKSELF AND STRONGSELFweakSelfHow to create a weakSelf? There are two ways.\n12__weak __typeof(self) weakSelf = self; // Write this code every time before you use weakself.\n12#define WEAKSELF typeof(self) __ weak weakSelf = self  // Or create a macro in header file, then you can use WEAKSELF everywhere.\nThe reason we use weakSelf in a block is that with weak property, the block won’t retain the object in the block. Then we break the cycle. For example 1, we can use weakself to solve the retain cycle problem.\n1234567891011121314151617181920212223#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        NSLog(@\"Car drived %@\", weakCar.miles);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nstrongSelf1__strong __typeof(weakSelf) strongSelf = weakSelf;\n1#define STRONGSELF typeof(weakSelf) __strong strongSelf = weakSelf\nSince we use weakSelf in the block to prevent the retain cycle problem, there is a potential problem that the object could be released before the block has been executed. \nexample 3:123456789101112131415161718192021222324#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^&#123;            NSLog(@\"Car drived %@\", weakCar.miles);        &#125;);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end\nI add a delay before executing the NSlog(). Then the output is:... 15:28:20.875923 BlockTest[7630:4429580] return\n... 15:28:23.065725 BlockTest[7630:4429580] Car drived (null)\nWhat is happening here? The dispatch_after() function submits the block (which contains NSLog()) to the given queue (Here is the main queue) at the time specified by the when (Here is after 2 sec) parameter. Think the block as a task. The dispatch_after() asynchronously add the task to the main queue after two sec when you execute the study block. Since the study block has a weak reference to the car, after the study block has been execute (car.drive() is called), the weakCar is released by ARC, then the weak object will be set as nil. However, the dispatch block is still not executed. That is why we got null in the output.\nSo, we add strongSelf in the block which prevent the object will not be released inside the block. After the block is executed, strongSelf then release.\n1234567891011121314151617181920212223242526#import \"ViewController.h\"#import \"Car.h\"@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad &#123;    [super viewDidLoad];    Car *car = [[Car alloc]init];    car.miles = @\"100 miles\";    __weak __typeof(car) weakCar = car;    car.drive = ^&#123;        __strong __typeof(weakCar) strongCar = weakCar;        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^&#123;            NSLog(@\"Car drived %@\", strongCar.miles);        &#125;);    &#125;;    car.drive();    NSLog(@\"return\");&#125;@end","dateCreated":"2016-10-25T19:51:16-07:00","dateModified":"2018-09-20T17:20:19-07:00","datePublished":"2016-10-25T19:51:16-07:00","description":"Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.","headline":"Why strongSelf and weakSelf?","image":["sws.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2016/10/25/strong-weak-self/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2016/10/25/strong-weak-self/","keywords":"iOS Animation, Objc, Memory Leak, Retain Cycle","thumbnailUrl":"sws.png"}</script>
     <meta name="description" content="Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.">
-<meta name="keywords" content="iOS Animation,Objc,Memory Leak,Retain Cycle">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Why strongSelf and weakSelf?">
 <meta property="og:url" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.">
-<meta property="og:locale" content="en">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-1.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-2.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-3.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-4.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-5.png">
-<meta property="og:updated_time" content="2018-09-21T00:20:19.000Z">
+<meta property="article:published_time" content="2016-10-26T02:51:16.000Z">
+<meta property="article:modified_time" content="2018-09-21T00:20:19.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS Animation">
+<meta property="article:tag" content="Objc">
+<meta property="article:tag" content="Memory Leak">
+<meta property="article:tag" content="Retain Cycle">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Why strongSelf and weakSelf?">
-<meta name="twitter:description" content="Before talking about strongSelf and weakSelf, I need briefly explain retain cycle.">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2016/10/25/strong-weak-self/strong-weak-self-1.png">
     
     
@@ -48,11 +51,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -77,12 +90,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -118,7 +131,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -186,7 +199,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -195,7 +208,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -204,7 +217,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -213,7 +226,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -322,7 +335,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Memory-Leak/">Memory Leak</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Retain-Cycle/">Retain Cycle</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS-Animation/">iOS Animation</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Memory-Leak/" rel="tag">Memory Leak</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Objc/" rel="tag">Objc</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Retain-Cycle/" rel="tag">Retain Cycle</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS-Animation/" rel="tag">iOS Animation</a>
 
             </div>
         
@@ -408,7 +421,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -573,10 +586,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
 

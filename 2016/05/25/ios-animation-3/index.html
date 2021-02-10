@@ -15,22 +15,23 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"\nLearning notes for book iOS Animations by Tutorials.\n\nThe UIView transform property is of type CGAffineTransform, and is used to represent a two-dimensional rotation, scale, or translation. By changing it, you can rotate, scale or translate a view.You can create a CGAffineTransform by these methods: \n\nCGAffineTransformMakeRotation(CGFloat angle)\nCGAffineTransformMakeScale(CGFloat sx, CGFloat sy)\nCGAffineTransformMakeTranslation(CGFloat tx, CGFloat ty)\n\nThe rotation and scale transforms are fairly self-explanatory—they rotate and scale a vector respectively. A translation transform just adds the specified x and y values to the vector—so if the vector represents a point, it moves the point.\nYou can combine new transform to an existing CGAffineTransform by using these methods:\n\nCGAffineTransformRotate(CGAffineTransform t, CGFloat angle)\nCGAffineTransformScale(CGAffineTransform t, CGFloat sx, CGFloat sy)\nCGAffineTransformTranslate(CGAffineTransform t, CGFloat tx, CGFloat ty)\n\nor you can combine two existing CGAffineTransform into one by using:\n\nCGAffineTransformConcat(CGAffineTransform t1, CGAffineTransform t2);\n\nLet’s see how to do a cube transition with CGAffineTransform.Image-1Look at the image. It looks like a cube that rotates around its center to reveal the next message on its sides. In fact, there are only two labels. One is login page and another is signup page. Let’s break it down. Now we only take care of login page label. It looks like this:Image-2It is obvious that we scale the label on its Y-axis. So let’s scale it by using the following code:\n1signInLbl.transform = CGAffineTransformMakeScale(1.0, 0.05)\nAs you can see, it scales the label on Y-axis from 1.0 to 0.05 (1.0 is the default). Let’s see the result:Image-3Well, looks like we still need do some thing. Here, the label just shrinks to the middle of Y-axis. Compared with our goal, it seems like that we need to move the shrinking destination down by half of label’s height. \n12let newLabelOffset = self.heading.frame.size.height / 2.0CGAffineTransformMakeTranslation(0.0, newLabelOffset)\nHere I didn’t write down “signInLbl.transform =”, because we can’t separately do the transforms. What we need is to combine the two CGAffineTransforms:\n1signInLbl.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, newLabelOffset))\nNow, We can get what we want for login page label.The order of the transformations really matters the final results. If you change the sequence of scale and translate, you will get different results. The reason for this is that when you apply transforms sequentially in this way, the previous transforms affect the subsequent ones.Let move on signup page label. It is easy now. The animation for signup page label is really like the reverse of signin page label animation. We first set its transform to:\n1signUpLbl.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, -newLabelOffset))\nAnd then set it back to normal. What is normal? Apple offered us a transform: CGAffineTransformIdentity. It is like the identity matrix in linear algebra. \n1signUpLbl.transform = CGAffineTransformIdentity\nOkey, here is the full codes:\n1234567891011121314151617181920212223242526272829303132func changeHeadingText(label label: UILabel) &#123;    if label.text == \"Login Page\" &#123;        self.cubeTrasition(label: label, toText: \"Signup Page\")    &#125; else &#123;        self.cubeTrasition(label: label, toText: \"Signin Page\")    &#125;&#125;func cubeTrasition(label label: UILabel, toText: String)&#123;    let newLabel = UILabel(frame: label.frame)    newLabel.text = toText    newLabel.font = label.font    newLabel.textAlignment = label.textAlignment    newLabel.textColor = label.textColor    newLabel.backgroundColor = UIColor.clearColor()    let newLabelOffset = label.frame.size.height / 2.0    newLabel.transform = CGAffineTransformConcat(    CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, -newLabelOffset))    label.superview!.addSubview(newLabel)     UIView.animateWithDuration(0.5, delay: 0.0, options: .CurveEaseOut, animations: &#123;         newLabel.transform = CGAffineTransformIdentity        label.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, newLabelOffset))    &#125;, completion: &#123;_ in        label.text = newLabel.text;        label.transform = CGAffineTransformIdentity        newLabel.removeFromSuperview()        self.changeHeadingText(label: self.heading)&#125;)","dateCreated":"2016-05-25T16:31:01-07:00","dateModified":"2018-09-20T17:21:37-07:00","datePublished":"2016-05-25T16:31:01-07:00","description":"\nLearning notes for book iOS Animations by Tutorials.\n\nThe UIView transform property is of type CGAffineTransform, and is used to represent a two-dimensional rotation, scale, or translation. By changing it, you can rotate, scale or translate a view.","headline":"iOS Animation - Understanding Transform","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/05/25/ios-animation-3/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/05/25/ios-animation-3/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"\nLearning notes for book iOS Animations by Tutorials.\n\nThe UIView transform property is of type CGAffineTransform, and is used to represent a two-dimensional rotation, scale, or translation. By changing it, you can rotate, scale or translate a view.You can create a CGAffineTransform by these methods: \n\nCGAffineTransformMakeRotation(CGFloat angle)\nCGAffineTransformMakeScale(CGFloat sx, CGFloat sy)\nCGAffineTransformMakeTranslation(CGFloat tx, CGFloat ty)\n\nThe rotation and scale transforms are fairly self-explanatory—they rotate and scale a vector respectively. A translation transform just adds the specified x and y values to the vector—so if the vector represents a point, it moves the point.\nYou can combine new transform to an existing CGAffineTransform by using these methods:\n\nCGAffineTransformRotate(CGAffineTransform t, CGFloat angle)\nCGAffineTransformScale(CGAffineTransform t, CGFloat sx, CGFloat sy)\nCGAffineTransformTranslate(CGAffineTransform t, CGFloat tx, CGFloat ty)\n\nor you can combine two existing CGAffineTransform into one by using:\n\nCGAffineTransformConcat(CGAffineTransform t1, CGAffineTransform t2);\n\nLet’s see how to do a cube transition with CGAffineTransform.Image-1Look at the image. It looks like a cube that rotates around its center to reveal the next message on its sides. In fact, there are only two labels. One is login page and another is signup page. Let’s break it down. Now we only take care of login page label. It looks like this:Image-2It is obvious that we scale the label on its Y-axis. So let’s scale it by using the following code:\n1signInLbl.transform = CGAffineTransformMakeScale(1.0, 0.05)\nAs you can see, it scales the label on Y-axis from 1.0 to 0.05 (1.0 is the default). Let’s see the result:Image-3Well, looks like we still need do some thing. Here, the label just shrinks to the middle of Y-axis. Compared with our goal, it seems like that we need to move the shrinking destination down by half of label’s height. \n12let newLabelOffset = self.heading.frame.size.height / 2.0CGAffineTransformMakeTranslation(0.0, newLabelOffset)\nHere I didn’t write down “signInLbl.transform =”, because we can’t separately do the transforms. What we need is to combine the two CGAffineTransforms:\n1signInLbl.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, newLabelOffset))\nNow, We can get what we want for login page label.The order of the transformations really matters the final results. If you change the sequence of scale and translate, you will get different results. The reason for this is that when you apply transforms sequentially in this way, the previous transforms affect the subsequent ones.Let move on signup page label. It is easy now. The animation for signup page label is really like the reverse of signin page label animation. We first set its transform to:\n1signUpLbl.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, -newLabelOffset))\nAnd then set it back to normal. What is normal? Apple offered us a transform: CGAffineTransformIdentity. It is like the identity matrix in linear algebra. \n1signUpLbl.transform = CGAffineTransformIdentity\nOkey, here is the full codes:\n1234567891011121314151617181920212223242526272829303132func changeHeadingText(label label: UILabel) &#123;    if label.text == \"Login Page\" &#123;        self.cubeTrasition(label: label, toText: \"Signup Page\")    &#125; else &#123;        self.cubeTrasition(label: label, toText: \"Signin Page\")    &#125;&#125;func cubeTrasition(label label: UILabel, toText: String)&#123;    let newLabel = UILabel(frame: label.frame)    newLabel.text = toText    newLabel.font = label.font    newLabel.textAlignment = label.textAlignment    newLabel.textColor = label.textColor    newLabel.backgroundColor = UIColor.clearColor()    let newLabelOffset = label.frame.size.height / 2.0    newLabel.transform = CGAffineTransformConcat(    CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, -newLabelOffset))    label.superview!.addSubview(newLabel)     UIView.animateWithDuration(0.5, delay: 0.0, options: .CurveEaseOut, animations: &#123;         newLabel.transform = CGAffineTransformIdentity        label.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.05), CGAffineTransformMakeTranslation(0.0, newLabelOffset))    &#125;, completion: &#123;_ in        label.text = newLabel.text;        label.transform = CGAffineTransformIdentity        newLabel.removeFromSuperview()        self.changeHeadingText(label: self.heading)&#125;)","dateCreated":"2016-05-25T16:31:01-07:00","dateModified":"2018-09-20T17:21:37-07:00","datePublished":"2016-05-25T16:31:01-07:00","description":"\nLearning notes for book iOS Animations by Tutorials.\n\nThe UIView transform property is of type CGAffineTransform, and is used to represent a two-dimensional rotation, scale, or translation. By changing it, you can rotate, scale or translate a view.","headline":"iOS Animation - Understanding Transform","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2016/05/25/ios-animation-3/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2016/05/25/ios-animation-3/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
     <meta name="description" content="Learning notes for book iOS Animations by Tutorials.  The UIView transform property is of type CGAffineTransform, and is used to represent a two-dimensional rotation, scale, or translation. By changi">
-<meta name="keywords" content="iOS Animation,Swift">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="iOS Animation - Understanding Transform">
 <meta property="og:url" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-3/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="Learning notes for book iOS Animations by Tutorials.  The UIView transform property is of type CGAffineTransform, and is used to represent a two-dimensional rotation, scale, or translation. By changi">
-<meta property="og:locale" content="en">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-3/c3-1.gif">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-3/c3-2.gif">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-3/c3-3.gif">
-<meta property="og:updated_time" content="2018-09-21T00:21:37.000Z">
+<meta property="article:published_time" content="2016-05-25T23:31:01.000Z">
+<meta property="article:modified_time" content="2018-09-21T00:21:37.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS Animation">
+<meta property="article:tag" content="Swift">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS Animation - Understanding Transform">
-<meta name="twitter:description" content="Learning notes for book iOS Animations by Tutorials.  The UIView transform property is of type CGAffineTransform, and is used to represent a two-dimensional rotation, scale, or translation. By changi">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-3/c3-1.gif">
     
     
@@ -46,11 +47,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -75,12 +86,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -116,7 +127,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -184,7 +195,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -193,7 +204,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -202,7 +213,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -211,7 +222,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -322,7 +333,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS-Animation/">iOS Animation</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Swift/" rel="tag">Swift</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS-Animation/" rel="tag">iOS Animation</a>
 
             </div>
         
@@ -412,7 +423,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -579,10 +590,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
     

@@ -15,19 +15,22 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"AVAsset is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVAsset is not the media itself, but acts as a container for timed media. It is composed of one or more media tracks along with metadata describing its contents.\n\nAVAsset confirms the AVAsynchronousKeyValueLoading protocol. We can querying an asset’s properties asynchronously.\n1234// check for status for a key- (AVKeyValueStatus)statusOfValueForKey:(NSString *)key error:(NSError * _Nullable * _Nullable)outError;// asynchronously load properties by given keys - (void)loadValuesAsynchronouslyForKeys:(NSArray&lt;NSString *&gt; *)keys completionHandler:(nullable void (^)(void))handler;\n123456789101112131415161718192021// example // Load the asset's \"playable\" key[asset loadValuesAsynchronouslyForKeys:@[@\"playable\"] completionHandler:^&#123;    NSError *error = nil;    AVKeyValueStatus status =        [asset statusOfValueForKey:@\"playable\" error:&amp;error];    switch (status) &#123;        case AVKeyValueStatusLoaded:            // Successfully loaded, continue processing            break;        case AVKeyValueStatusFailed:            // Examine NSError pointer to determine failure            break;        case AVKeyValueStatusCancelled:            // Loading cancelled            break;        default:            // Handle all other cases            break;    &#125;&#125;];\nNote that:The completionHandler block will be called only once per invocation of loadValuesAsynchronouslyForKeys:completionHandler:, no matter how many keys you pass to this methods.We need to call status statusOfValueForKey:error: on each property you requested.\nhttps://developer.apple.com/documentation/avfoundation/avasset\n","dateCreated":"2017-08-21T18:43:54-07:00","dateModified":"2018-09-26T18:50:30-07:00","datePublished":"2017-08-21T18:43:54-07:00","description":"AVAsset is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVAsset is not the media itself, but acts as a container for timed media. It is composed of one or more media tracks along with metadata describing its contents.","headline":"AVAssets - AVFoundation","image":["AVFoundation.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2017/08/21/avfoundation-avassets/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2017/08/21/avfoundation-avassets/","keywords":"iOS, AVFoundation, Objc, AVAssets","thumbnailUrl":"AVFoundation.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"AVAsset is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVAsset is not the media itself, but acts as a container for timed media. It is composed of one or more media tracks along with metadata describing its contents.\n\nAVAsset confirms the AVAsynchronousKeyValueLoading protocol. We can querying an asset’s properties asynchronously.\n1234// check for status for a key- (AVKeyValueStatus)statusOfValueForKey:(NSString *)key error:(NSError * _Nullable * _Nullable)outError;// asynchronously load properties by given keys - (void)loadValuesAsynchronouslyForKeys:(NSArray&lt;NSString *&gt; *)keys completionHandler:(nullable void (^)(void))handler;\n123456789101112131415161718192021// example // Load the asset's \"playable\" key[asset loadValuesAsynchronouslyForKeys:@[@\"playable\"] completionHandler:^&#123;    NSError *error = nil;    AVKeyValueStatus status =        [asset statusOfValueForKey:@\"playable\" error:&amp;error];    switch (status) &#123;        case AVKeyValueStatusLoaded:            // Successfully loaded, continue processing            break;        case AVKeyValueStatusFailed:            // Examine NSError pointer to determine failure            break;        case AVKeyValueStatusCancelled:            // Loading cancelled            break;        default:            // Handle all other cases            break;    &#125;&#125;];\nNote that:The completionHandler block will be called only once per invocation of loadValuesAsynchronouslyForKeys:completionHandler:, no matter how many keys you pass to this methods.We need to call status statusOfValueForKey:error: on each property you requested.\nhttps://developer.apple.com/documentation/avfoundation/avasset\n","dateCreated":"2017-08-21T18:43:54-07:00","dateModified":"2018-09-26T18:50:30-07:00","datePublished":"2017-08-21T18:43:54-07:00","description":"AVAsset is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVAsset is not the media itself, but acts as a container for timed media. It is composed of one or more media tracks along with metadata describing its contents.","headline":"AVAssets - AVFoundation","image":["AVFoundation.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2017/08/21/avfoundation-avassets/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2017/08/21/avfoundation-avassets/","keywords":"iOS, AVFoundation, Objc, AVAssets","thumbnailUrl":"AVFoundation.png"}</script>
     <meta name="description" content="AVAsset is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVA">
-<meta name="keywords" content="iOS,AVFoundation,Objc,AVAssets">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="AVAssets - AVFoundation">
 <meta property="og:url" content="https://jasonhan1990.github.io/2017/08/21/avfoundation-avassets/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="AVAsset is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVA">
-<meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-09-27T01:50:30.000Z">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2017-08-22T01:43:54.000Z">
+<meta property="article:modified_time" content="2018-09-27T01:50:30.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="AVFoundation">
+<meta property="article:tag" content="Objc">
+<meta property="article:tag" content="AVAssets">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="AVAssets - AVFoundation">
-<meta name="twitter:description" content="AVAsset is an abstract, immutable class providing a composite representation of a media resource, modeling the static attributes of the media as a whole, such as its title, duration, and metadata. AVA">
     
     
         
@@ -42,11 +45,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -71,12 +84,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -112,7 +125,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -180,7 +193,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -189,7 +202,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -198,7 +211,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -207,7 +220,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -294,7 +307,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVAssets/">AVAssets</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVFoundation/">AVFoundation</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/AVAssets/" rel="tag">AVAssets</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/AVFoundation/" rel="tag">AVFoundation</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Objc/" rel="tag">Objc</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS/" rel="tag">iOS</a>
 
             </div>
         
@@ -384,7 +397,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -551,10 +564,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
     

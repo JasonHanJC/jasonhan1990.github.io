@@ -15,20 +15,23 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.Things that AVAudioPlayer can’t do:\n\nPlay audio from a network stream\nAccess the raw audio sample\nRequire very low latency\n\nCreate AVAudioPlayerThe AVAudioPlayer can be created by NSData or NSURL.\n12345678910111213141516171819202122// Initializer for AVAudioPlayer- (nullable instancetype)initWithContentsOfURL:(NSURL *)url error:(NSError **)outError;- (nullable instancetype)initWithData:(NSData *)data error:(NSError **)outError;// Example: // A function to create an AVAudioPlayer with local audio file name and its extension- (AVAudioPlayer *)playerFileName:(NSString *)name withExtension:(NSString *)extension &#123;    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:name withExtension:extension];    NSError *err;    AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&amp;err];        // Configure the player    if (player) &#123;        player.numberOfLoops = -1; // infinite loop        player.enableRate = YES;        [player prepareToPlay];    &#125; else &#123;        NSLog(@\"%@\", [err localizedDescription]);    &#125;        return player;&#125;\nControlling PlaybackAVAudioPlayer provides ways for us to modify the player’s volume, panning, playback rate, number of looping and preform audio metering.Calling play() will play a sound asynchronously. It will implicitly call the prepareToPlay() if the audio player is not already prepared to play. We can call the prepareToPlay() method after we created a audio player to minimize the lag between calling the play() method. Calling stop() method will stop the playback and undo the setup from prepareToPlay().\n12345678910111213141516171819/* set the audio player’s stereo pan position, value from -1.0 to 1.0. A value of -1.0 is full left, 0.0 is center, 1.0 is full right. */@property float pan;/* set the audio player’s volume, value from 0.0 to 1.0. */@property float volume;/* set the audio player’s playback rate. Default value is 1.0, value 0.5 is half-speed playback, 2.0 is double-speed playback. To set playback rate, we need to enable rate adjustment. */@property float rate;/* default is NO */@property BOOL enableRate;/* set number of times a sound will return to the beginning to repeat playback. Default value is 0, play once, a value of 1 plays twice, a negative value will play infinitely */@property NSInteger numberOfLoops;- (BOOL)prepareToPlay;- (void)play;- (BOOL)playAtTime:(NSTimeInterval)time;- (void)pause;- (void)stop;\nAudio Level MeteringAVAudioPlayer doesn’t meter the audio-level by default. We can turn it on and get average sound decibel and peak decibel.\n1234567/* default is not enabled */@property(getter=isMeteringEnabled) BOOL meteringEnabled; /* Refreshes the average and peak power values for all channels of an audio player. For best results, call this function in CADisplayLink */- (void)updateMeters; - (float)peakPowerForChannel:(NSUInteger)channelNumber; - (float)averagePowerForChannel:(NSUInteger)channelNumber;\nConfigure AVAudioSessionIn order to make our app playback sound when we lock the screen or we turn our cellphones to silent mode, we need to choose the correct AVAudioSessionCategory to AVAudioSession.AVAudioSession is a global singleton instance. We can configure it after app launched. There are several categories. https://developer.apple.com/documentation/avfoundation/avaudiosession/audio_session_categories\n\n\n\nCategory\nAllows Mixing\nAudio Input\nAudio Output\nWhen Screen Lock\nWhen Silent\n\n\n\n\nAmbient\nyes\nno\nyes\noff\noff\n\n\nSolo Ambient\nno\nno\nyes\noff\noff\n\n\nPlayback\noptional\nno\nyes\non\non\n\n\nRecord\nno\nyes\nno\non\non\n\n\nPlay and Record\noptional\nyes\nyes\non\non\n\n\nMulti-Route\nno\nyes\nyes\non\non\n\n\n\n123456789101112// Configure AVAudioSessionAVAudioSession *session = [AVAudioSession sharedInstance];NSError *error;// use AVAudioSessionCategoryPlayback to make the app playback sound when screen locked and silent turned onif (![session setCategory:AVAudioSessionCategoryPlayback error:&amp;error]) &#123;    NSLog(@\"Category Error: %@\", [error localizedDescription]);&#125;    if (![session setActive:YES error:&amp;error]) &#123;    NSLog(@\"Activation Error: %@\", [error localizedDescription]);&#125;\nIn order to make the app play in the background, we also need change the info.plist file. Add following code to the file.\n1234&lt;key&gt;UIBackgroundModes&lt;/key&gt;&lt;array&gt;    &lt;string&gt;audio&lt;/string&gt;&lt;/array&gt;\nAdding this setting specifies that the application is now allowed to play audio in the background.\nHandle InterruptionWhen we got a call or alarm, our app will automatically pause the sound, but it will not play the sound after the interruption. We can listen the AVAudioSessionInterruptionNotification notification and code the behavior we want.\n123456789101112131415// add notification for audio player controller[[NSNotificationCenter defaultCenter] addObserver:self                                        selector:@selector(handleInterruption:)                                           name:AVAudioSessionInterruptionNotification                                         object:[AVAudioSession sharedInstance]];                                         - (void)handleInterruption:(NSNotification *)notification&#123;    AVAudioSessionInterruptionType type = [notification.userInfo[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];    if (type == AVAudioSessionInterruptionTypeBegan) &#123;        // do something when interruption began    &#125;else if (type == AVAudioSessionInterruptionTypeEnded) &#123;        // do something when interruption ended    &#125;&#125;\nHandle Route ChangeWhen we switch the audio output route, iOS will send a route change notification. Suppose we want to stop the playback when users unplug their headphone, we can check the notification’s userInfo dictionary for the route change reason and for a description of the previous audio route. If previous portType is AVAudioSessionPortHeadphones, we stop the playback.\n1234567891011121314151617// Note This is not calling from main thread[[NSNotificationCenter defaultCenter] addObserver:self                                        selector:@selector(handleRouteChange:)                                            name:AVAudioSessionRouteChangeNotification                                          object:[AVAudioSession sharedInstance]];- (void)handleRouteChange:(NSNotification *)notification &#123;        AVAudioSessionRouteChangeReason reason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue];    if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) &#123;        AVAudioSessionRouteDescription *preRoute = notification.userInfo[AVAudioSessionRouteChangePreviousRouteKey];        NSString *portType = [[preRoute.outputs firstObject] portType];        if ([portType isEqualToString:AVAudioSessionPortHeadphones]) &#123;            // stop the playback        &#125;    &#125;&#125;\nAVAudioPlayer Delegate1234// Called when audioplayer finished playing.- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag;// Called when an audio player encounters a decoding error during playback.- (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error;\nHere is the link for the test app: AVAudioPlayer Test AppScreenshot\nAVFoundation Developer Guide\n","dateCreated":"2017-08-15T14:03:50-07:00","dateModified":"2018-09-25T14:38:34-07:00","datePublished":"2017-08-15T14:03:50-07:00","description":"AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.","headline":"AVAudioPlayer - AVFoundation","image":["AVFoundation.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/","keywords":"iOS, AVFoundation, Objc, AVAudioPlayer","thumbnailUrl":"AVFoundation.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.Things that AVAudioPlayer can’t do:\n\nPlay audio from a network stream\nAccess the raw audio sample\nRequire very low latency\n\nCreate AVAudioPlayerThe AVAudioPlayer can be created by NSData or NSURL.\n12345678910111213141516171819202122// Initializer for AVAudioPlayer- (nullable instancetype)initWithContentsOfURL:(NSURL *)url error:(NSError **)outError;- (nullable instancetype)initWithData:(NSData *)data error:(NSError **)outError;// Example: // A function to create an AVAudioPlayer with local audio file name and its extension- (AVAudioPlayer *)playerFileName:(NSString *)name withExtension:(NSString *)extension &#123;    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:name withExtension:extension];    NSError *err;    AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&amp;err];        // Configure the player    if (player) &#123;        player.numberOfLoops = -1; // infinite loop        player.enableRate = YES;        [player prepareToPlay];    &#125; else &#123;        NSLog(@\"%@\", [err localizedDescription]);    &#125;        return player;&#125;\nControlling PlaybackAVAudioPlayer provides ways for us to modify the player’s volume, panning, playback rate, number of looping and preform audio metering.Calling play() will play a sound asynchronously. It will implicitly call the prepareToPlay() if the audio player is not already prepared to play. We can call the prepareToPlay() method after we created a audio player to minimize the lag between calling the play() method. Calling stop() method will stop the playback and undo the setup from prepareToPlay().\n12345678910111213141516171819/* set the audio player’s stereo pan position, value from -1.0 to 1.0. A value of -1.0 is full left, 0.0 is center, 1.0 is full right. */@property float pan;/* set the audio player’s volume, value from 0.0 to 1.0. */@property float volume;/* set the audio player’s playback rate. Default value is 1.0, value 0.5 is half-speed playback, 2.0 is double-speed playback. To set playback rate, we need to enable rate adjustment. */@property float rate;/* default is NO */@property BOOL enableRate;/* set number of times a sound will return to the beginning to repeat playback. Default value is 0, play once, a value of 1 plays twice, a negative value will play infinitely */@property NSInteger numberOfLoops;- (BOOL)prepareToPlay;- (void)play;- (BOOL)playAtTime:(NSTimeInterval)time;- (void)pause;- (void)stop;\nAudio Level MeteringAVAudioPlayer doesn’t meter the audio-level by default. We can turn it on and get average sound decibel and peak decibel.\n1234567/* default is not enabled */@property(getter=isMeteringEnabled) BOOL meteringEnabled; /* Refreshes the average and peak power values for all channels of an audio player. For best results, call this function in CADisplayLink */- (void)updateMeters; - (float)peakPowerForChannel:(NSUInteger)channelNumber; - (float)averagePowerForChannel:(NSUInteger)channelNumber;\nConfigure AVAudioSessionIn order to make our app playback sound when we lock the screen or we turn our cellphones to silent mode, we need to choose the correct AVAudioSessionCategory to AVAudioSession.AVAudioSession is a global singleton instance. We can configure it after app launched. There are several categories. https://developer.apple.com/documentation/avfoundation/avaudiosession/audio_session_categories\n\n\n\nCategory\nAllows Mixing\nAudio Input\nAudio Output\nWhen Screen Lock\nWhen Silent\n\n\n\n\nAmbient\nyes\nno\nyes\noff\noff\n\n\nSolo Ambient\nno\nno\nyes\noff\noff\n\n\nPlayback\noptional\nno\nyes\non\non\n\n\nRecord\nno\nyes\nno\non\non\n\n\nPlay and Record\noptional\nyes\nyes\non\non\n\n\nMulti-Route\nno\nyes\nyes\non\non\n\n\n\n123456789101112// Configure AVAudioSessionAVAudioSession *session = [AVAudioSession sharedInstance];NSError *error;// use AVAudioSessionCategoryPlayback to make the app playback sound when screen locked and silent turned onif (![session setCategory:AVAudioSessionCategoryPlayback error:&amp;error]) &#123;    NSLog(@\"Category Error: %@\", [error localizedDescription]);&#125;    if (![session setActive:YES error:&amp;error]) &#123;    NSLog(@\"Activation Error: %@\", [error localizedDescription]);&#125;\nIn order to make the app play in the background, we also need change the info.plist file. Add following code to the file.\n1234&lt;key&gt;UIBackgroundModes&lt;/key&gt;&lt;array&gt;    &lt;string&gt;audio&lt;/string&gt;&lt;/array&gt;\nAdding this setting specifies that the application is now allowed to play audio in the background.\nHandle InterruptionWhen we got a call or alarm, our app will automatically pause the sound, but it will not play the sound after the interruption. We can listen the AVAudioSessionInterruptionNotification notification and code the behavior we want.\n123456789101112131415// add notification for audio player controller[[NSNotificationCenter defaultCenter] addObserver:self                                        selector:@selector(handleInterruption:)                                           name:AVAudioSessionInterruptionNotification                                         object:[AVAudioSession sharedInstance]];                                         - (void)handleInterruption:(NSNotification *)notification&#123;    AVAudioSessionInterruptionType type = [notification.userInfo[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];    if (type == AVAudioSessionInterruptionTypeBegan) &#123;        // do something when interruption began    &#125;else if (type == AVAudioSessionInterruptionTypeEnded) &#123;        // do something when interruption ended    &#125;&#125;\nHandle Route ChangeWhen we switch the audio output route, iOS will send a route change notification. Suppose we want to stop the playback when users unplug their headphone, we can check the notification’s userInfo dictionary for the route change reason and for a description of the previous audio route. If previous portType is AVAudioSessionPortHeadphones, we stop the playback.\n1234567891011121314151617// Note This is not calling from main thread[[NSNotificationCenter defaultCenter] addObserver:self                                        selector:@selector(handleRouteChange:)                                            name:AVAudioSessionRouteChangeNotification                                          object:[AVAudioSession sharedInstance]];- (void)handleRouteChange:(NSNotification *)notification &#123;        AVAudioSessionRouteChangeReason reason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue];    if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) &#123;        AVAudioSessionRouteDescription *preRoute = notification.userInfo[AVAudioSessionRouteChangePreviousRouteKey];        NSString *portType = [[preRoute.outputs firstObject] portType];        if ([portType isEqualToString:AVAudioSessionPortHeadphones]) &#123;            // stop the playback        &#125;    &#125;&#125;\nAVAudioPlayer Delegate1234// Called when audioplayer finished playing.- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag;// Called when an audio player encounters a decoding error during playback.- (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error;\nHere is the link for the test app: AVAudioPlayer Test AppScreenshot\nAVFoundation Developer Guide\n","dateCreated":"2017-08-15T14:03:50-07:00","dateModified":"2018-09-25T14:38:34-07:00","datePublished":"2017-08-15T14:03:50-07:00","description":"AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Queue Service.","headline":"AVAudioPlayer - AVFoundation","image":["AVFoundation.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/","keywords":"iOS, AVFoundation, Objc, AVAudioPlayer","thumbnailUrl":"AVFoundation.png"}</script>
     <meta name="description" content="AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Que">
-<meta name="keywords" content="iOS,AVFoundation,Objc,AVAudioPlayer">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="AVAudioPlayer - AVFoundation">
 <meta property="og:url" content="https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Que">
-<meta property="og:locale" content="en">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/Simulator-Screen-Shot.png">
-<meta property="og:updated_time" content="2018-09-25T21:38:34.000Z">
+<meta property="article:published_time" content="2017-08-15T21:03:50.000Z">
+<meta property="article:modified_time" content="2018-09-25T21:38:34.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="AVFoundation">
+<meta property="article:tag" content="Objc">
+<meta property="article:tag" content="AVAudioPlayer">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="AVAudioPlayer - AVFoundation">
-<meta name="twitter:description" content="AVAudioPlayer makes easy to playback the audio data from local files and memory. It is built on top of Core Audio’s C-based Audio Queue Service. It provides all core functions we can find in Audio Que">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2017/08/15/avfoundation-avaudioplayer/Simulator-Screen-Shot.png">
     
     
@@ -44,11 +47,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -73,12 +86,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -114,7 +127,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -182,7 +195,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -191,7 +204,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -200,7 +213,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -209,7 +222,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -375,7 +388,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVAudioPlayer/">AVAudioPlayer</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/AVFoundation/">AVFoundation</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/AVAudioPlayer/" rel="tag">AVAudioPlayer</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/AVFoundation/" rel="tag">AVFoundation</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Objc/" rel="tag">Objc</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS/" rel="tag">iOS</a>
 
             </div>
         
@@ -465,7 +478,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -632,10 +645,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
     

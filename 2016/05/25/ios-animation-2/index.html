@@ -15,20 +15,21 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"\nLearning notes for book iOS Animations by Tutorials.\n\nFirst, what is the difference between transitionWithView and animationWithDuration?animateWithDuration animates a UIView through changing its properties, whereas transitionWithView allows you to apply a transition to the specified view so that you can make state changes to it, such as add, remove, hide, show and replace one view with another view.\nThen, here is an example. We added a hidden logging status view to the root view. After clicked the Login button, we show the status view. After 1.5 seconds, we hide the status view and refresh to the next status.Image-1The code looks like this:1234567891011121314151617showMessage() &#123;    UIView.transitionWithView(status, duration: 0.33, options: [.CurveEaseOut, .TransitionCurlDown], animations: &#123;        self.status.hidden = false    &#125;, completion: &#123;_ in        delay(seconds: 1.5, completion: &#123;            self.removeMessage()        &#125;)    &#125;)&#125;removeMessage() &#123;    UIView.animateWithDuration(0.33, delay: 0.0, options: [], animations: &#123;         self.status.center.x += self.view.frame.size.width    &#125;, completion: &#123;_ in        self.status.hidden = true        self.showNextMessage()    &#125;)&#125;\nThe first parameter in transitionWithView() is the container view that performs the transition (Here is the status view). The rest of parameters are quite similar to the animateWithDuration().\nTransition option:\n\n.TransitionFlipFromLeft\n.TransitionFlipFromRight\n.TransitionCurlUp\n.TransitionCurlDown\n.TransitionCrossDissolve\n.TransitionFlipFromTop\n.TransitionFlipFromBottom\n\n","dateCreated":"2016-05-25T16:07:20-07:00","dateModified":"2018-09-20T17:21:55-07:00","datePublished":"2016-05-25T16:07:20-07:00","description":"\nLearning notes for book iOS Animations by Tutorials.\n\nFirst, what is the difference between transitionWithView and animationWithDuration?","headline":"iOS Animation - UIView.TransitionWithView","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/05/25/ios-animation-2/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/05/25/ios-animation-2/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"\nLearning notes for book iOS Animations by Tutorials.\n\nFirst, what is the difference between transitionWithView and animationWithDuration?animateWithDuration animates a UIView through changing its properties, whereas transitionWithView allows you to apply a transition to the specified view so that you can make state changes to it, such as add, remove, hide, show and replace one view with another view.\nThen, here is an example. We added a hidden logging status view to the root view. After clicked the Login button, we show the status view. After 1.5 seconds, we hide the status view and refresh to the next status.Image-1The code looks like this:1234567891011121314151617showMessage() &#123;    UIView.transitionWithView(status, duration: 0.33, options: [.CurveEaseOut, .TransitionCurlDown], animations: &#123;        self.status.hidden = false    &#125;, completion: &#123;_ in        delay(seconds: 1.5, completion: &#123;            self.removeMessage()        &#125;)    &#125;)&#125;removeMessage() &#123;    UIView.animateWithDuration(0.33, delay: 0.0, options: [], animations: &#123;         self.status.center.x += self.view.frame.size.width    &#125;, completion: &#123;_ in        self.status.hidden = true        self.showNextMessage()    &#125;)&#125;\nThe first parameter in transitionWithView() is the container view that performs the transition (Here is the status view). The rest of parameters are quite similar to the animateWithDuration().\nTransition option:\n\n.TransitionFlipFromLeft\n.TransitionFlipFromRight\n.TransitionCurlUp\n.TransitionCurlDown\n.TransitionCrossDissolve\n.TransitionFlipFromTop\n.TransitionFlipFromBottom\n\n","dateCreated":"2016-05-25T16:07:20-07:00","dateModified":"2018-09-20T17:21:55-07:00","datePublished":"2016-05-25T16:07:20-07:00","description":"\nLearning notes for book iOS Animations by Tutorials.\n\nFirst, what is the difference between transitionWithView and animationWithDuration?","headline":"iOS Animation - UIView.TransitionWithView","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2016/05/25/ios-animation-2/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2016/05/25/ios-animation-2/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
     <meta name="description" content="Learning notes for book iOS Animations by Tutorials.  First, what is the difference between transitionWithView and animationWithDuration?">
-<meta name="keywords" content="iOS Animation,Swift">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="iOS Animation - UIView.TransitionWithView">
 <meta property="og:url" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-2/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="Learning notes for book iOS Animations by Tutorials.  First, what is the difference between transitionWithView and animationWithDuration?">
-<meta property="og:locale" content="en">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-2/C3.gif">
-<meta property="og:updated_time" content="2018-09-21T00:21:55.000Z">
+<meta property="article:published_time" content="2016-05-25T23:07:20.000Z">
+<meta property="article:modified_time" content="2018-09-21T00:21:55.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS Animation">
+<meta property="article:tag" content="Swift">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS Animation - UIView.TransitionWithView">
-<meta name="twitter:description" content="Learning notes for book iOS Animations by Tutorials.  First, what is the difference between transitionWithView and animationWithDuration?">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2016/05/25/ios-animation-2/C3.gif">
     
     
@@ -44,11 +45,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -73,12 +84,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -114,7 +125,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -182,7 +193,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -191,7 +202,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -200,7 +211,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -209,7 +220,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -305,7 +316,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS-Animation/">iOS Animation</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Swift/" rel="tag">Swift</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS-Animation/" rel="tag">iOS Animation</a>
 
             </div>
         
@@ -395,7 +406,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -562,10 +573,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
     

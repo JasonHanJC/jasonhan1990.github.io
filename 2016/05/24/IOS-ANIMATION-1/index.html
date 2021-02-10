@@ -15,21 +15,22 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"\nLearning notes for book iOS Animations by Tutorials.\n\nLogging page is very common in your mobile apps today. A fancy logging page will catch people’s eyes at the very beginning. Let’s do it.Shifting and Fade in:Image-1The view contains: \n\nA heading Label shows login page\nA Username textField\nA Password textField\nA Login button\n\nThe animation shows that the label comes from left to right first, then follow by the username textField, and then follow by the password textField. The log in button starts to fade in when the password textField starts to come in. The password textField and the login button finish their animation at the same time.\nSo, what we need to do first is to hide all the components before view starts to appear. In viewWillAppear(), we do:\n123456// move the following components out of the screen heading.center.x -= view.bounds.widthusername.center.x -= view.bounds.widthpassword.center.x -= veiw.bounds.width// set login button transparentloginButton.alpha = 0.0\nAfter we done in viewWillAppear(), we start to write down the animation code in viewDidAppear(), which will show animation before the view fully loaded. Here we will use UIView class method “animateWithDuration”. In viewDidAppear(), we do:123456789101112UIView.animateWithDuration(1.0, animations: &#123;    self.heading.center.x += self.view.bounds.width;&#125;)UIView.animateWithDuration(1.0, delay: 0.4, options: [], animations: &#123;    self.username.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.8, options: [], animations: &#123;    self.password.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.8, options: [], animations: &#123;    self.loginButton.alpha += 1.0&#125;, completion: nil)\nIn the class method, it has some parameters to let you customize your animation:\n\nduration: The duration of the animation.\ndelay: A number of seconds UIKit will wait before it starts the animation.\noption: A set of animation options allowing you to customize a number of aspects of your animation. (Default: CurveEaseInOut)\nanimation: The closure expression to provide your animation.\ncompletion: The code needs to be executed after the animation completes. It could be nil.\n\nSpringImage-2Spring is easy. We still use the same class method from UIView animateWithDuration but with different parameters. Codes in viewDidAppear().\n1234567891011UIView.animateWithDuration(1.0, delay: 0.4, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: &#123;    self.username.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.4, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: &#123;    self.password.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.4, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.0, options: [], animations: &#123;    self.loginButton.center.y += 30;    self.loginButton.bounds.size.width += 30    self.loginButton.alpha += 1;&#125;, completion: nil)\nThe new parameters are:\n\nusingSpringWithDamping: You can think of this value as the “stiffness” of the spring.\ninitialSpringVelocity: This controls the initial velocity of the animation.\n\nThe method animateWithDuration allows you to animate the following properties of a UIView:\n\nframe\nbounds\ncenter\ntransform\nalpha\nbackground\ncontentStretch\n\n","dateCreated":"2016-05-24T12:36:26-07:00","dateModified":"2018-09-20T17:22:13-07:00","datePublished":"2016-05-24T12:36:26-07:00","description":"\nLearning notes for book iOS Animations by Tutorials.\n\nLogging page is very common in your mobile apps today. A fancy logging page will catch people’s eyes at the very beginning. Let’s do it.","headline":"iOS Animation - UIView.AnimationWithDurarion","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"\nLearning notes for book iOS Animations by Tutorials.\n\nLogging page is very common in your mobile apps today. A fancy logging page will catch people’s eyes at the very beginning. Let’s do it.Shifting and Fade in:Image-1The view contains: \n\nA heading Label shows login page\nA Username textField\nA Password textField\nA Login button\n\nThe animation shows that the label comes from left to right first, then follow by the username textField, and then follow by the password textField. The log in button starts to fade in when the password textField starts to come in. The password textField and the login button finish their animation at the same time.\nSo, what we need to do first is to hide all the components before view starts to appear. In viewWillAppear(), we do:\n123456// move the following components out of the screen heading.center.x -= view.bounds.widthusername.center.x -= view.bounds.widthpassword.center.x -= veiw.bounds.width// set login button transparentloginButton.alpha = 0.0\nAfter we done in viewWillAppear(), we start to write down the animation code in viewDidAppear(), which will show animation before the view fully loaded. Here we will use UIView class method “animateWithDuration”. In viewDidAppear(), we do:123456789101112UIView.animateWithDuration(1.0, animations: &#123;    self.heading.center.x += self.view.bounds.width;&#125;)UIView.animateWithDuration(1.0, delay: 0.4, options: [], animations: &#123;    self.username.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.8, options: [], animations: &#123;    self.password.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.8, options: [], animations: &#123;    self.loginButton.alpha += 1.0&#125;, completion: nil)\nIn the class method, it has some parameters to let you customize your animation:\n\nduration: The duration of the animation.\ndelay: A number of seconds UIKit will wait before it starts the animation.\noption: A set of animation options allowing you to customize a number of aspects of your animation. (Default: CurveEaseInOut)\nanimation: The closure expression to provide your animation.\ncompletion: The code needs to be executed after the animation completes. It could be nil.\n\nSpringImage-2Spring is easy. We still use the same class method from UIView animateWithDuration but with different parameters. Codes in viewDidAppear().\n1234567891011UIView.animateWithDuration(1.0, delay: 0.4, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: &#123;    self.username.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.4, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: &#123;    self.password.center.x += self.view.bounds.width;&#125;, completion: nil)UIView.animateWithDuration(1.0, delay: 0.4, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.0, options: [], animations: &#123;    self.loginButton.center.y += 30;    self.loginButton.bounds.size.width += 30    self.loginButton.alpha += 1;&#125;, completion: nil)\nThe new parameters are:\n\nusingSpringWithDamping: You can think of this value as the “stiffness” of the spring.\ninitialSpringVelocity: This controls the initial velocity of the animation.\n\nThe method animateWithDuration allows you to animate the following properties of a UIView:\n\nframe\nbounds\ncenter\ntransform\nalpha\nbackground\ncontentStretch\n\n","dateCreated":"2016-05-24T12:36:26-07:00","dateModified":"2018-09-20T17:22:13-07:00","datePublished":"2016-05-24T12:36:26-07:00","description":"\nLearning notes for book iOS Animations by Tutorials.\n\nLogging page is very common in your mobile apps today. A fancy logging page will catch people’s eyes at the very beginning. Let’s do it.","headline":"iOS Animation - UIView.AnimationWithDurarion","image":["Swift.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/","keywords":"iOS Animation, Swift","thumbnailUrl":"Swift.png"}</script>
     <meta name="description" content="Learning notes for book iOS Animations by Tutorials.  Logging page is very common in your mobile apps today. A fancy logging page will catch people’s eyes at the very beginning. Let’s do it.">
-<meta name="keywords" content="iOS Animation,Swift">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="iOS Animation - UIView.AnimationWithDurarion">
 <meta property="og:url" content="https://jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="Learning notes for book iOS Animations by Tutorials.  Logging page is very common in your mobile apps today. A fancy logging page will catch people’s eyes at the very beginning. Let’s do it.">
-<meta property="og:locale" content="en">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/C1.gif">
 <meta property="og:image" content="https://jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/C2.gif">
-<meta property="og:updated_time" content="2018-09-21T00:22:13.000Z">
+<meta property="article:published_time" content="2016-05-24T19:36:26.000Z">
+<meta property="article:modified_time" content="2018-09-21T00:22:13.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS Animation">
+<meta property="article:tag" content="Swift">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS Animation - UIView.AnimationWithDurarion">
-<meta name="twitter:description" content="Learning notes for book iOS Animations by Tutorials.  Logging page is very common in your mobile apps today. A fancy logging page will catch people’s eyes at the very beginning. Let’s do it.">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2016/05/24/IOS-ANIMATION-1/C1.gif">
     
     
@@ -45,11 +46,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -74,12 +85,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -115,7 +126,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -183,7 +194,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -192,7 +203,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -201,7 +212,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -210,7 +221,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -329,7 +340,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS-Animation/">iOS Animation</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Swift/" rel="tag">Swift</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS-Animation/" rel="tag">iOS Animation</a>
 
             </div>
         
@@ -418,7 +429,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -584,10 +595,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
     

@@ -15,15 +15,14 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"I wrote a chrome extension to scrape college admission data.\nRecently, I am working on a project about training a model to predict the result of college admission. Me and my teammate, we are searching for data from https://www.collegedata.com. Unfortunately, the website doesn’t offer data downloading. So I started to write a program to scrape the data.My first implementation was using Cheerio (https://github.com/cheeriojs/cheerio), a NodeJS framework that is good at parsing and searching HTML nodes.However, I need to hand typing a bunch of variables as inputs to my program. And for my teammate, it was not convenient for him to use. He needed to install NodeJS and know some basic knowledge of how NodeJS works.\nMy second implementation was to create a chrome extension and use jQuery to scrape the data. Then, I packed the extension and sent it to my teammate to install and use it.\nSince it is not a commercial extension. I was keeping things simple.\nFiles\n\nmanifest.json: All the configuration of your extension.\ncontent.js: My code that creates UI and scrapes the data.\nFileSaver.js: Use it to save the data as a file. (https://github.com/eligrey/FileSaver.js/)\n\nmanifest.json12345678910111213141516&#123;    \"manifest_version\": 2,    \"name\": \"Collegedata-Srcaper\",    \"version\": \"0.1\",    \"content_scripts\": [        &#123;          \"matches\": [            \"https://www.collegedata.com/*\"          ],          \"js\": [\"jquery-3.3.1.min.js\",\"FileSaver.js\", \"content.js\"]        &#125;    ],    \"browser_action\": &#123;        \"default_icon\": \"icon.png\"    &#125;&#125;\nFor “js” section, the order is important. Chrome loads them sequentially. So, the libs need to load first.\nInstall and pack your extensionGo to chrome -&gt; extension. Toggle the developer mode. Then load unpacked extention.\nScreenshotsAfter installing the extension, in the https://www.collegedata.com website, a floating bar appears on the top left corner.\n\nThe extension works when there are data on the page. Otherwise, it just alerts you “No data found”.\nSo, go the admission tracking page, and type in the university and years that you want to look at. Here, I typed in Stanford, and year from 2010 to 2020.\n\nOnce the data are retrieved from server. Click “Download” button. Then, save the data.csv file to your desktop.\n\nOpen with Office Excel.\n\nBravo!!!Link to the code: https://bitbucket.org/JunchengHan/collegedata-scraper-extension/src\n","dateCreated":"2019-03-28T23:08:46-07:00","dateModified":"2019-04-16T11:11:01-07:00","datePublished":"2019-03-28T23:08:46-07:00","description":"I wrote a chrome extension to scrape college admission data.","headline":"My first chrome extension - College Data Scraper","image":["icon.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/","keywords":"javascript, chrome extension","thumbnailUrl":"icon.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"I wrote a chrome extension to scrape college admission data.\nRecently, I am working on a project about training a model to predict the result of college admission. Me and my teammate, we are searching for data from https://www.collegedata.com. Unfortunately, the website doesn’t offer data downloading. So I started to write a program to scrape the data.My first implementation was using Cheerio (https://github.com/cheeriojs/cheerio), a NodeJS framework that is good at parsing and searching HTML nodes.However, I need to hand typing a bunch of variables as inputs to my program. And for my teammate, it was not convenient for him to use. He needed to install NodeJS and know some basic knowledge of how NodeJS works.\nMy second implementation was to create a chrome extension and use jQuery to scrape the data. Then, I packed the extension and sent it to my teammate to install and use it.\nSince it is not a commercial extension. I was keeping things simple.\nFiles\n\nmanifest.json: All the configuration of your extension.\ncontent.js: My code that creates UI and scrapes the data.\nFileSaver.js: Use it to save the data as a file. (https://github.com/eligrey/FileSaver.js/)\n\nmanifest.json12345678910111213141516&#123;    \"manifest_version\": 2,    \"name\": \"Collegedata-Srcaper\",    \"version\": \"0.1\",    \"content_scripts\": [        &#123;          \"matches\": [            \"https://www.collegedata.com/*\"          ],          \"js\": [\"jquery-3.3.1.min.js\",\"FileSaver.js\", \"content.js\"]        &#125;    ],    \"browser_action\": &#123;        \"default_icon\": \"icon.png\"    &#125;&#125;\nFor “js” section, the order is important. Chrome loads them sequentially. So, the libs need to load first.\nInstall and pack your extensionGo to chrome -&gt; extension. Toggle the developer mode. Then load unpacked extention.\nScreenshotsAfter installing the extension, in the https://www.collegedata.com website, a floating bar appears on the top left corner.\n\nThe extension works when there are data on the page. Otherwise, it just alerts you “No data found”.\nSo, go the admission tracking page, and type in the university and years that you want to look at. Here, I typed in Stanford, and year from 2010 to 2020.\n\nOnce the data are retrieved from server. Click “Download” button. Then, save the data.csv file to your desktop.\n\nOpen with Office Excel.\n\nBravo!!!Link to the code: https://bitbucket.org/JunchengHan/collegedata-scraper-extension/src\n","dateCreated":"2019-03-28T23:08:46-07:00","dateModified":"2019-04-16T11:11:01-07:00","datePublished":"2019-03-28T23:08:46-07:00","description":"I wrote a chrome extension to scrape college admission data.","headline":"My first chrome extension - College Data Scraper","image":["icon.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/","keywords":"javascript, chrome extension","thumbnailUrl":"icon.jpg"}</script>
     <meta name="description" content="I wrote a chrome extension to scrape college admission data.">
-<meta name="keywords" content="javascript,chrome extension">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="My first chrome extension - College Data Scraper">
 <meta property="og:url" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="I wrote a chrome extension to scrape college admission data.">
-<meta property="og:locale" content="en">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.39.39%20PM.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.52.38%20PM.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.52.57%20PM.png">
@@ -31,10 +30,12 @@
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.50.13%20PM.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-29%20at%2012.08.25%20AM.png">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-29%20at%2012.30.33%20AM.png">
-<meta property="og:updated_time" content="2019-04-16T18:11:01.000Z">
+<meta property="article:published_time" content="2019-03-29T06:08:46.000Z">
+<meta property="article:modified_time" content="2019-04-16T18:11:01.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="javascript">
+<meta property="article:tag" content="chrome extension">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="My first chrome extension - College Data Scraper">
-<meta name="twitter:description" content="I wrote a chrome extension to scrape college admission data.">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2019/03/28/my-first-chrome-extension/Screen%20Shot%202019-03-28%20at%2011.39.39%20PM.png">
     
     
@@ -50,11 +51,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -79,12 +90,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -120,7 +131,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -188,7 +199,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -197,7 +208,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -206,7 +217,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -215,7 +226,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -318,7 +329,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/chrome-extension/">chrome extension</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/javascript/">javascript</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/chrome-extension/" rel="tag">chrome extension</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/javascript/" rel="tag">javascript</a>
 
             </div>
         
@@ -408,7 +419,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -575,10 +586,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
     

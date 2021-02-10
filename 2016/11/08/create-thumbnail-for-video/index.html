@@ -15,19 +15,21 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"Here is how to create thumbnail for videos. Two steps:\n\nUse AVURLAsset to access to the video file by URL. Then use AVAssetImageGenerator to generate an image of one frame.\nTo distinguish the image we generated from normal images, add a play icon on the top of the image by merging two UIImage .\n\nCode:\n12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152+ (UIImage *)createVideoThumbnailWithPath:(NSString *)videoPath &#123;    if (!videoPath)        return nil;    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:videoPath] options:nil];    AVAssetImageGenerator *imgGenerator = [[AVAssetImageGenerator alloc] initWithAsset:asset];    imgGenerator.appliesPreferredTrackTransform = YES;    imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeEncodedPixels;    // create CGImage    CGImageRef thumbnailImgRef = nil;    // the time frame    CFTimeInterval thumbnailImageTime = 0;    NSError *error = nil;    // get the image    thumbnailImgRef = [imgGenerator copyCGImageAtTime:CMTimeMake(thumbnailImageTime, 60) actualTime:nil error:&amp;error];    // error handling    if (!thumbnailImgRef)        NSLog(@\"VIDEO THUMBNAIL ERROR: %@\", error);    // convert to UIImage    UIImage *image = thumbnailImgRef ? [[UIImage alloc] initWithCGImage:thumbnailImgRef] : nil;    // add playIcon    if (image) &#123;        // grab your play icon        UIImage *playIcon = [UIImage imageNamed:@\"PlayIcon\"];        // start image context        UIGraphicsBeginImageContext(image.size);        // add original image first with existing opacity        [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];        // add play icon over the image in the middle with supplied opacity if applicable        [playIcon drawInRect:CGRectMake((image.size.width - playIcon.size.width) / 2.0,                                        (image.size.height - playIcon.size.height) / 2.0,                                        playIcon.size.width,playIcon.size.height)                   blendMode:kCGBlendModeNormal                       alpha:0.9];        // get merged image        UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();        UIGraphicsEndImageContext();        return newImage;    &#125;    return image;&#125;","dateCreated":"2016-11-08T16:18:05-08:00","dateModified":"2018-09-20T17:23:58-07:00","datePublished":"2016-11-08T16:18:05-08:00","description":"Here is how to create thumbnail for videos. Two steps:","headline":"Create Thumbnail For Video","image":["code-snippet.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/11/08/create-thumbnail-for-video/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/11/08/create-thumbnail-for-video/","keywords":"iOS, Objc, Code Snippet","thumbnailUrl":"code-snippet.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"Here is how to create thumbnail for videos. Two steps:\n\nUse AVURLAsset to access to the video file by URL. Then use AVAssetImageGenerator to generate an image of one frame.\nTo distinguish the image we generated from normal images, add a play icon on the top of the image by merging two UIImage .\n\nCode:\n12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152+ (UIImage *)createVideoThumbnailWithPath:(NSString *)videoPath &#123;    if (!videoPath)        return nil;    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:videoPath] options:nil];    AVAssetImageGenerator *imgGenerator = [[AVAssetImageGenerator alloc] initWithAsset:asset];    imgGenerator.appliesPreferredTrackTransform = YES;    imgGenerator.apertureMode = AVAssetImageGeneratorApertureModeEncodedPixels;    // create CGImage    CGImageRef thumbnailImgRef = nil;    // the time frame    CFTimeInterval thumbnailImageTime = 0;    NSError *error = nil;    // get the image    thumbnailImgRef = [imgGenerator copyCGImageAtTime:CMTimeMake(thumbnailImageTime, 60) actualTime:nil error:&amp;error];    // error handling    if (!thumbnailImgRef)        NSLog(@\"VIDEO THUMBNAIL ERROR: %@\", error);    // convert to UIImage    UIImage *image = thumbnailImgRef ? [[UIImage alloc] initWithCGImage:thumbnailImgRef] : nil;    // add playIcon    if (image) &#123;        // grab your play icon        UIImage *playIcon = [UIImage imageNamed:@\"PlayIcon\"];        // start image context        UIGraphicsBeginImageContext(image.size);        // add original image first with existing opacity        [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];        // add play icon over the image in the middle with supplied opacity if applicable        [playIcon drawInRect:CGRectMake((image.size.width - playIcon.size.width) / 2.0,                                        (image.size.height - playIcon.size.height) / 2.0,                                        playIcon.size.width,playIcon.size.height)                   blendMode:kCGBlendModeNormal                       alpha:0.9];        // get merged image        UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();        UIGraphicsEndImageContext();        return newImage;    &#125;    return image;&#125;","dateCreated":"2016-11-08T16:18:05-08:00","dateModified":"2018-09-20T17:23:58-07:00","datePublished":"2016-11-08T16:18:05-08:00","description":"Here is how to create thumbnail for videos. Two steps:","headline":"Create Thumbnail For Video","image":["code-snippet.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2016/11/08/create-thumbnail-for-video/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2016/11/08/create-thumbnail-for-video/","keywords":"iOS, Objc, Code Snippet","thumbnailUrl":"code-snippet.jpg"}</script>
     <meta name="description" content="Here is how to create thumbnail for videos. Two steps:">
-<meta name="keywords" content="iOS,Objc,Code Snippet">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Create Thumbnail For Video">
 <meta property="og:url" content="https://jasonhan1990.github.io/2016/11/08/create-thumbnail-for-video/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="Here is how to create thumbnail for videos. Two steps:">
-<meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-09-21T00:23:58.000Z">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-11-09T00:18:05.000Z">
+<meta property="article:modified_time" content="2018-09-21T00:23:58.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Objc">
+<meta property="article:tag" content="Code Snippet">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Create Thumbnail For Video">
-<meta name="twitter:description" content="Here is how to create thumbnail for videos. Two steps:">
     
     
         
@@ -42,11 +44,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -71,12 +83,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -112,7 +124,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -180,7 +192,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -189,7 +201,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -198,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -207,7 +219,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -293,7 +305,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Code-Snippet/">Code Snippet</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Code-Snippet/" rel="tag">Code Snippet</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Objc/" rel="tag">Objc</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS/" rel="tag">iOS</a>
 
             </div>
         
@@ -379,7 +391,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -544,10 +556,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
 

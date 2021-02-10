@@ -15,20 +15,21 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.\n\nPasta example from https://www.hackingwithswift.com/articles/77/whats-new-in-swift-4-2\n1234567enum Pasta: CaseIterable &#123;\tcase cannelloni, fusilli, linguine, tagliatelle&#125;for pasta in Pasta.allCases &#123;\tprint(pasta)&#125;\nPrint out:\n1234cannellonifusillilinguinetagliatelle\nThen you can easily generate data for table view.\n12345678910111213141516171819202122232425262728293031323334enum Pasta: CaseIterable &#123;    case conchiglie, fusilli, linguine, tagliatelle        var name: String &#123;        switch self &#123;        case .conchiglie: return \"Conchiglie\"        case .fusilli: return \"Fusilli\"        case .linguine: return \"Linguine\"        case .tagliatelle: return \"Tagliatelle\"        &#125;    &#125;        var shape: String &#123;        switch self &#123;        case .conchiglie: return \"Shells\"        case .fusilli: return \"Twists\"        case .linguine: return \"Long and skinny\"        case .tagliatelle: return \"Long ribbons\"        &#125;    &#125;        var image: UIImage &#123;        switch self &#123;        case .conchiglie: return UIImage(named: \"conchiglie\")!        case .fusilli: return UIImage(named: \"fusilli\")!        case .linguine: return UIImage(named: \"linguine\")!        case .tagliatelle: return UIImage(named: \"tagliatelle\")!        &#125;    &#125;&#125;// Generate data for the table viewvar objectsForTableView: [Pasta] = Pasta.allcases...\nHere is the pasta table:\n","dateCreated":"2019-02-06T23:02:34-08:00","dateModified":"2019-02-06T23:15:55-08:00","datePublished":"2019-02-06T23:02:34-08:00","description":"The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.","headline":"CaseIterable from Swift 4.2","image":["pasta-table.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/","keywords":"Swift, iOS","thumbnailUrl":"pasta-table.jpg"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.\n\nPasta example from https://www.hackingwithswift.com/articles/77/whats-new-in-swift-4-2\n1234567enum Pasta: CaseIterable &#123;\tcase cannelloni, fusilli, linguine, tagliatelle&#125;for pasta in Pasta.allCases &#123;\tprint(pasta)&#125;\nPrint out:\n1234cannellonifusillilinguinetagliatelle\nThen you can easily generate data for table view.\n12345678910111213141516171819202122232425262728293031323334enum Pasta: CaseIterable &#123;    case conchiglie, fusilli, linguine, tagliatelle        var name: String &#123;        switch self &#123;        case .conchiglie: return \"Conchiglie\"        case .fusilli: return \"Fusilli\"        case .linguine: return \"Linguine\"        case .tagliatelle: return \"Tagliatelle\"        &#125;    &#125;        var shape: String &#123;        switch self &#123;        case .conchiglie: return \"Shells\"        case .fusilli: return \"Twists\"        case .linguine: return \"Long and skinny\"        case .tagliatelle: return \"Long ribbons\"        &#125;    &#125;        var image: UIImage &#123;        switch self &#123;        case .conchiglie: return UIImage(named: \"conchiglie\")!        case .fusilli: return UIImage(named: \"fusilli\")!        case .linguine: return UIImage(named: \"linguine\")!        case .tagliatelle: return UIImage(named: \"tagliatelle\")!        &#125;    &#125;&#125;// Generate data for the table viewvar objectsForTableView: [Pasta] = Pasta.allcases...\nHere is the pasta table:\n","dateCreated":"2019-02-06T23:02:34-08:00","dateModified":"2019-02-06T23:15:55-08:00","datePublished":"2019-02-06T23:02:34-08:00","description":"The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.","headline":"CaseIterable from Swift 4.2","image":["pasta-table.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2019/02/06/swift-new-feature-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2019/02/06/swift-new-feature-1/","keywords":"Swift, iOS","thumbnailUrl":"pasta-table.jpg"}</script>
     <meta name="description" content="The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.">
-<meta name="keywords" content="Swift,iOS">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="CaseIterable from Swift 4.2">
 <meta property="og:url" content="https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.">
-<meta property="og:locale" content="en">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/pasta-table.jpg">
-<meta property="og:updated_time" content="2019-02-07T07:15:55.000Z">
+<meta property="article:published_time" content="2019-02-07T07:02:34.000Z">
+<meta property="article:modified_time" content="2019-02-07T07:15:55.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="Swift">
+<meta property="article:tag" content="iOS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CaseIterable from Swift 4.2">
-<meta name="twitter:description" content="The new CaseIterable protocol gives your Enum new ability to generate an array of all cases in an enum.">
 <meta name="twitter:image" content="https://jasonhan1990.github.io/2019/02/06/swift-new-feature-1/pasta-table.jpg">
     
     
@@ -44,11 +45,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -73,12 +84,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -114,7 +125,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -182,7 +193,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -191,7 +202,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -200,7 +211,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -209,7 +220,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -298,7 +309,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/Swift/">Swift</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Swift/" rel="tag">Swift</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS/" rel="tag">iOS</a>
 
             </div>
         
@@ -384,7 +395,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -549,10 +560,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
 

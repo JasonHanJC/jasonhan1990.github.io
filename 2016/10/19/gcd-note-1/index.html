@@ -15,19 +15,21 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="../../../../atom.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"GCD is the short form of Grand Central Dispatch. To understand GCD, there are several concepts needed to be known.\nTask:Task is a relatively abstract concept. It could be an operation, a function or a method. In most cases, we can consider a task to be a block(or closure in Swift). \nQUEUE:Queues are provided bt GCD to handle submitted tasks in FIFO order.\nThere are two kinds of queues:\n\nSerial Queue: execute tasks one at a time in the current thread, each task starting only after the preceding task has finished. This makes sure that no critical section happens.\nConcurrent Queue: execute tasks in multiple threads but still start in FIFO order. It is up tp GCD to determine whether one of the tasks should run on a different core.\n\nHow to create a queue:\n123456// parameter 1: the name of the queue// parameter 2: // type of the queue: // DISPATCH_QUEUE_SERIAL/NULL means serial queue，// DISPATCH_QUEUE_CONCURRENT means concurrent queuedispatch_queue_t serialQ = dispatch_queue_create(\"name\", NULL);\nThe iOS system offers two kinds of queues: main queue and global queue.\nThe global queue is a concurrent queue. It has no name. We can get it by:\n1dispatch_queue_t Q = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);\nThe main queue is a serial queue. It is running on the main thread for UI updating. We can get it by:\n1dispatch_queue_t Q = dispatch_get_main_queue();\nIt is good to know that queue is like object which has reference counting. When a task is added to a queue, this queue will be retained, and the count++. The memory will be released when all the tasks in this queue are executed. It is important to create a queue with strong type.\nSYNCHRONOUS VS. ASYNCHRONOUSThese terms describe when a function will return control to the caller, and how much work will have been done by that point.\nA synchronous function returns only after the completion of a task that it orders. No new thread and it will block current thread.\nAn asynchronous function, on the other hand, returns immediately, ordering the task to be done but not waiting for it. Thus, an asynchronous function does not block the current thread of execution from proceeding on to the next function. GCD will open a new thread if there are available threads. It will now block current thread. (Part from raywenderlich.com)\nThe functions to achieve Synchronous and Asynchronous execution:\n1234567/* synchronousperameter 1：the queue need to be executedperameter 2：the block*/void dispatch_sync(dispatch_queue_t queue, dispatch_block_t block);// asynchronousvoid dispatch_async(dispatch_queue_t queue, dispatch_block_t block);\nFOUR CASESThere are two kinds of queues: serial queue and concurrent queue. And there are two kinds of execution. So 2 by 2, there are four cases. What is happening for each of them?\n\nSynchronously execute a serial queue: Synchronous means no new thread. So, it will execute the tasks one after preceding one in the current thread.\nAsynchronously execute a serial queue: Asynchronous means new threads might be opened. But if GCD opened multiple threads, it can not guaranty that the tasks in the serial queue will be executed in FIFO order. So, only one thread will be opened.\nSynchronously execute a concurrent queue: Synchronous means no new thread. So, just execute in order.\nAsynchronously execute a concurrent queue: GCD will open multiple threads based on current condition, and take tasks out of the queue in order, but execute them in disorder.\n\nDEADLOCKThreads are said to be deadlocked if they all get stuck waiting for each other to complete or perform another action. The first can’t finish because it’s waiting for the second to finish. But the second can’t finish because it’s waiting for the first to finish. (From raywenderlich.com)\n\nRemember! On a serial queue, never call dispatch_sync targeting the same queue!\n\nFor example, deadlock the main thread:\n12345678910- (void)mainThreadDeadLockTest &#123;    NSLog(@\"begin\");    dispatch_sync(dispatch_get_main_queue(), ^&#123;        NSLog(@\"middle\");        &#125;);    NSLog(@\"end\");&#125;// nslog print out:// begin\nThe main queue is a serial queue. The dispatch_sync will block current queue which is the main queue to run the code in the dispatch block. But here, in the dispatch_sync, we added a task to the main queue to execute. However, the main queue is already blocked. It can not execute the block. \nDeadlock anther custom serial thread:\n123456789101112131415- (void)deadLockTest &#123;    dispatch_queue_t serialQueue = dispatch_queue_create(\"serial_queue\", DISPATCH_QUEUE_SERIAL);    dispatch_async(serialQueue, ^&#123;        NSLog(@\"begin\");        dispatch_sync(serialQueue, ^&#123;            NSLog(@\"middle\");        &#125;);        NSLog(@\"end\");    &#125;);    NSLog(@\"return\");&#125;// nslog print outreturnbegin\nThe new serial queue is a deadlock, but it will not affect the main thread.\n","dateCreated":"2016-10-19T16:40:56-07:00","dateModified":"2018-09-20T17:23:13-07:00","datePublished":"2016-10-19T16:40:56-07:00","description":"GCD is the short form of Grand Central Dispatch. To understand GCD, there are several concepts needed to be known.","headline":"GCD Note 1","image":["GCD.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://jasonhan1990.github.io/2016/10/19/gcd-note-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"https://jasonhan1990.github.io/2016/10/19/gcd-note-1/","keywords":"iOS, Objc, GCD","thumbnailUrl":"GCD.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg"},"articleBody":"GCD is the short form of Grand Central Dispatch. To understand GCD, there are several concepts needed to be known.\nTask:Task is a relatively abstract concept. It could be an operation, a function or a method. In most cases, we can consider a task to be a block(or closure in Swift). \nQUEUE:Queues are provided bt GCD to handle submitted tasks in FIFO order.\nThere are two kinds of queues:\n\nSerial Queue: execute tasks one at a time in the current thread, each task starting only after the preceding task has finished. This makes sure that no critical section happens.\nConcurrent Queue: execute tasks in multiple threads but still start in FIFO order. It is up tp GCD to determine whether one of the tasks should run on a different core.\n\nHow to create a queue:\n123456// parameter 1: the name of the queue// parameter 2: // type of the queue: // DISPATCH_QUEUE_SERIAL/NULL means serial queue，// DISPATCH_QUEUE_CONCURRENT means concurrent queuedispatch_queue_t serialQ = dispatch_queue_create(\"name\", NULL);\nThe iOS system offers two kinds of queues: main queue and global queue.\nThe global queue is a concurrent queue. It has no name. We can get it by:\n1dispatch_queue_t Q = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);\nThe main queue is a serial queue. It is running on the main thread for UI updating. We can get it by:\n1dispatch_queue_t Q = dispatch_get_main_queue();\nIt is good to know that queue is like object which has reference counting. When a task is added to a queue, this queue will be retained, and the count++. The memory will be released when all the tasks in this queue are executed. It is important to create a queue with strong type.\nSYNCHRONOUS VS. ASYNCHRONOUSThese terms describe when a function will return control to the caller, and how much work will have been done by that point.\nA synchronous function returns only after the completion of a task that it orders. No new thread and it will block current thread.\nAn asynchronous function, on the other hand, returns immediately, ordering the task to be done but not waiting for it. Thus, an asynchronous function does not block the current thread of execution from proceeding on to the next function. GCD will open a new thread if there are available threads. It will now block current thread. (Part from raywenderlich.com)\nThe functions to achieve Synchronous and Asynchronous execution:\n1234567/* synchronousperameter 1：the queue need to be executedperameter 2：the block*/void dispatch_sync(dispatch_queue_t queue, dispatch_block_t block);// asynchronousvoid dispatch_async(dispatch_queue_t queue, dispatch_block_t block);\nFOUR CASESThere are two kinds of queues: serial queue and concurrent queue. And there are two kinds of execution. So 2 by 2, there are four cases. What is happening for each of them?\n\nSynchronously execute a serial queue: Synchronous means no new thread. So, it will execute the tasks one after preceding one in the current thread.\nAsynchronously execute a serial queue: Asynchronous means new threads might be opened. But if GCD opened multiple threads, it can not guaranty that the tasks in the serial queue will be executed in FIFO order. So, only one thread will be opened.\nSynchronously execute a concurrent queue: Synchronous means no new thread. So, just execute in order.\nAsynchronously execute a concurrent queue: GCD will open multiple threads based on current condition, and take tasks out of the queue in order, but execute them in disorder.\n\nDEADLOCKThreads are said to be deadlocked if they all get stuck waiting for each other to complete or perform another action. The first can’t finish because it’s waiting for the second to finish. But the second can’t finish because it’s waiting for the first to finish. (From raywenderlich.com)\n\nRemember! On a serial queue, never call dispatch_sync targeting the same queue!\n\nFor example, deadlock the main thread:\n12345678910- (void)mainThreadDeadLockTest &#123;    NSLog(@\"begin\");    dispatch_sync(dispatch_get_main_queue(), ^&#123;        NSLog(@\"middle\");        &#125;);    NSLog(@\"end\");&#125;// nslog print out:// begin\nThe main queue is a serial queue. The dispatch_sync will block current queue which is the main queue to run the code in the dispatch block. But here, in the dispatch_sync, we added a task to the main queue to execute. However, the main queue is already blocked. It can not execute the block. \nDeadlock anther custom serial thread:\n123456789101112131415- (void)deadLockTest &#123;    dispatch_queue_t serialQueue = dispatch_queue_create(\"serial_queue\", DISPATCH_QUEUE_SERIAL);    dispatch_async(serialQueue, ^&#123;        NSLog(@\"begin\");        dispatch_sync(serialQueue, ^&#123;            NSLog(@\"middle\");        &#125;);        NSLog(@\"end\");    &#125;);    NSLog(@\"return\");&#125;// nslog print outreturnbegin\nThe new serial queue is a deadlock, but it will not affect the main thread.\n","dateCreated":"2016-10-19T16:40:56-07:00","dateModified":"2018-09-20T17:23:13-07:00","datePublished":"2016-10-19T16:40:56-07:00","description":"GCD is the short form of Grand Central Dispatch. To understand GCD, there are several concepts needed to be known.","headline":"GCD Note 1","image":["GCD.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"../../../../https:/jasonhan1990.github.io/2016/10/19/gcd-note-1/"},"publisher":{"@type":"Organization","name":"Juncheng Han","sameAs":["https://github.com/JasonHan1990","https://www.linkedin.com/in/junchenghan","mailto:namrie1990@gmail.com","https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0"],"image":"avatar.jpg","logo":{"@type":"ImageObject","url":"avatar.jpg"}},"url":"../../../../https:/jasonhan1990.github.io/2016/10/19/gcd-note-1/","keywords":"iOS, Objc, GCD","thumbnailUrl":"GCD.png"}</script>
     <meta name="description" content="GCD is the short form of Grand Central Dispatch. To understand GCD, there are several concepts needed to be known.">
-<meta name="keywords" content="iOS,Objc,GCD">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="GCD Note 1">
 <meta property="og:url" content="https://jasonhan1990.github.io/2016/10/19/gcd-note-1/index.html">
 <meta property="og:site_name" content="Jason&#39;s Blog">
 <meta property="og:description" content="GCD is the short form of Grand Central Dispatch. To understand GCD, there are several concepts needed to be known.">
-<meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-09-21T00:23:13.000Z">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-10-19T23:40:56.000Z">
+<meta property="article:modified_time" content="2018-09-21T00:23:13.000Z">
+<meta property="article:author" content="Juncheng Han">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Objc">
+<meta property="article:tag" content="GCD">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="GCD Note 1">
-<meta name="twitter:description" content="GCD is the short form of Grand Central Dispatch. To understand GCD, there are several concepts needed to be known.">
     
     
         
@@ -42,11 +44,21 @@
     
     
     <!--STYLES-->
-    <link rel="stylesheet" href="../../../../assets/css/all.css">
-    <link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="../../../../assets/css/thumbs.css">
-    <link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
-    <link rel="stylesheet" href="../../../../assets/css/materialize.css">
+    
+<link rel="stylesheet" href="../../../../assets/css/all.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/jquery.fancybox.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/thumbs.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/tranquilpeak.css">
+
+    
+<link rel="stylesheet" href="../../../../assets/css/materialize.css">
+
     <!--STYLES END-->
     
     <script type="text/javascript">
@@ -71,12 +83,12 @@
 <header id="header" data-behavior="2">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a class="header-title-link" href="../../../../ ">Jason&#39;s Blog</a>
+        <a class="header-title-link" href="../../../../%20">Jason&#39;s Blog</a>
     </div>
     
         
             <a  class="header-right-icon "
-                href="#about">
+                href="../../../../#about">
         
         
             <i class="avatar.jpg fa-lg"></i>
@@ -112,7 +124,7 @@
                 <li class="sidebar-button">
                     
                         <a  class="sidebar-button-link "
-                             href="../../../../ "
+                             href="../../../../%20"
                             
                             title="Home 主页"
                         >
@@ -180,7 +192,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
+                        <a  class="sidebar-button-link " href="../../../../https:/github.com/JasonHan1990" target="_blank" rel="noopener" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -189,7 +201,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.linkedin.com/in/junchenghan" target="_blank" rel="noopener" title="LinkedIn 领英">
                     
                         <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">LinkedIn 领英</span>
@@ -198,7 +210,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
+                        <a  class="sidebar-button-link " href="../../../../mailto:namrie1990@gmail.com" target="_blank" rel="noopener" title="Mail 邮箱">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail 邮箱</span>
@@ -207,7 +219,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
+                        <a  class="sidebar-button-link " href="../../../../https:/www.dropbox.com/sh/a8czjo2chheae47/AABZy0UBJfYmues8s63EkHNva?dl=0" target="_blank" rel="noopener" title="Résumé 简历">
                     
                         <i class="sidebar-button-icon fa fa-file" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Résumé 简历</span>
@@ -325,7 +337,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">TAGGED IN</span><br/>
                 
-    <a class="tag tag--primary tag--small t-link" href="../../../../tags/GCD/">GCD</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/Objc/">Objc</a> <a class="tag tag--primary tag--small t-link" href="../../../../tags/iOS/">iOS</a>
+    <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/GCD/" rel="tag">GCD</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/Objc/" rel="tag">Objc</a> <a class="tag tag--primary tag--small t-none-link" href="../../../../tags/iOS/" rel="tag">iOS</a>
 
             </div>
         
@@ -411,7 +423,7 @@
 
                 <footer id="footer" class="main-content-wrap">
     <span class="copyrights">
-        Copyrights &copy; 2020 Juncheng Han. All Rights Reserved.
+        Copyrights &copy; 2021 Juncheng Han. All Rights Reserved.
     </span>
 </footer>
 
@@ -576,10 +588,18 @@
         
 <div id="cover" style="background-image:url('../../../../assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
+
 <script src="../../../../assets/js/jquery.js"></script>
+
+
 <script src="../../../../assets/js/jquery.fancybox.js"></script>
+
+
 <script src="../../../../assets/js/thumbs.js"></script>
+
+
 <script src="../../../../assets/js/tranquilpeak.js"></script>
+
 <!--SCRIPTS END-->
 
 
